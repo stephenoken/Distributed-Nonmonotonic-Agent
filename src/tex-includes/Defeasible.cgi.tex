@@ -1,0 +1,45 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% script:  Defeasible.cgi.tex
+%%
+%% created: 12/12/99 by Andrew Rock
+%%
+%% purpose: User's guide for the Deimos www interface.
+%%
+
+
+\module{CGI Tool} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   \label{CGIUser}
+
+   The program {\tt Defeasible.cgi} is a Common Gateway
+   Interface program which provides a world wide web 
+   interface to \deimos. The program should be
+   accessed with a WWW browser with the URL:
+   {\tt http://your.www.site/Defeasible.cgi}.
+
+   \noindent For our WWW site, this is: \\
+   {\tt \href{http://www.cit.gu.edu.au/~arock/defeasible/Defeasible.cgi}{http://www.cit.gu.edu.au/\twiddle arock/defeasible/Defeasible.cgi}}   
+
+   This opens the starting page for the system, containing
+   pointers to information about Defeasible logic
+   and \deimos. A form allows the user to select an example
+   Defeasible theory to work with, or to open a page
+   where a new theory can be entered.
+   
+   With a theory selected or entered, the user can enter
+   queries in the form of tagged literals. The form for
+   entry of the queries has a menu that selects the prover
+   to use. The choices available are equivalent to those
+   offered by {\tt ODProver} and summarized
+   in table~\ref{flatHistProversTable}.
+   
+   The CGI tool is stateless. All information about a session
+   is maintained within the HTML data returned to the
+   user's browser.
+   
+   
+   
+   

@@ -1,0 +1,20 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+\begin{alltt}
+\hypertarget{factP\newLinkVer}{fact} ::= \hyperlink{prolog_literalP\linkVer}{prolog_literal} | \hyperlink{literalP\linkVer}{literal}
+
+\hypertarget{rule_P\newLinkVer}{rule'} ::= \hyperlink{prolog_ruleP\linkVer}{prolog_rule} | \hyperlink{ruleP\linkVer}{rule}
+
+\hypertarget{prolog_superiorityP\newLinkVer}{prolog_superiority}
+   ::= "sup" "(" "("  \hyperlink{rule_P\linkVer}{rule'} ")" "," "(" \hyperlink{rule_P\linkVer}{rule'} ")" ")"
+   
+\hypertarget{labeled_ruleP\newLinkVer}{labeled_rule} ::= [\hyperlink{labelP\linkVer}{label} ":"] \hyperlink{rule_P\linkVer}{rule'}
+
+\hypertarget{statementP\newLinkVer}{statement} ::=   \hyperlink{prolog_superiorityP\linkVer}{prolog_superiority}
+              | \hyperlink{labeled_ruleP\linkVer}{labeled_rule}
+              | \hyperlink{factP\linkVer}{fact} 
+              | \hyperlink{priorityP\linkVer}{priority}
+
+\hypertarget{theoryP\newLinkVer}{theory} ::= \verb"{"\hyperlink{statementP\linkVer}{statement} "."\verb"}"
+\end{alltt}

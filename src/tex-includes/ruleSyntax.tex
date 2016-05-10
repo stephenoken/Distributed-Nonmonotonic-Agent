@@ -1,0 +1,11 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+\begin{alltt}
+\hypertarget{antecedentP\newLinkVer}{antecedent} ::=   "\verb"{"" "\verb"}""
+               | "\verb"{"" \hyperlink{literalP\linkVer}{literal} \verb"{""," \hyperlink{literalP\linkVer}{literal}\verb"}" "\verb"}""
+               | \hyperlink{literalP\linkVer}{literal} \verb"{""," \hyperlink{literalP\linkVer}{literal}\verb"}"
+               | epsilon
+
+\hypertarget{ruleP\newLinkVer}{rule} ::= \hyperlink{antecedentP\linkVer}{antecedent} ("\verb"->"" | "\verb"=>"" | "\verb"~>"") \hyperlink{literalP\linkVer}{literal}
+\end{alltt}

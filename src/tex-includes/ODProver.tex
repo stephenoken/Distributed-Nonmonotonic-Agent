@@ -1,0 +1,82 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% file:    ODProver.tex
+%%
+%% created: 16/11/99 by Andrew Rock
+%%
+%% purpose: User's guide for ODProver.
+%%
+
+\module{ODProver} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{ODProverUser}
+
+The program {\tt ODProver} is a query answering
+prover with an improved (faster) implementation.
+
+This program can be run using the Hugs interpreter,
+or compiled with GHC and run directly from the shell.
+
+
+\submodule{Usage (GHC)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Run the program by typing a command of the form:
+
+\begin{alltt}
+$ ODProver\it options\tt [\it{theory-file-name}\tt [\it{tagged-literal}\tt]]
+\end{alltt}
+
+\noindent The program options, commands and behavior
+are the same as described for
+{\tt DProver} in section~\ref{DProverUser}, with
+the following exceptions:
+
+\begin{itemize}
+   \item Prover engines with well-founded sematics
+      are not available.
+   \item Some additional provers with an array-based history 
+      for improved speed are provided.
+   \item Run-files are not implemented. Consequently
+      there is no {\tt -r} command line option or
+      {\tt r} command.
+\end{itemize}
+
+The available provers are listed in 
+table~\ref{flatHistProversTable}.
+
+\begin{table}[h]
+
+\setMyFontSize
+
+\centering
+
+% \renewcommand{\arraystretch}[0]{1.5}
+
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+
+\emph{prover} & \emph{counts} & \emph{keeps}   & \emph{detects} & \emph{well-}   & \emph{prints} \\ 
+\emph{name}   & \emph{goals}  & \emph{history} & \emph{loops}   & \emph{founded} & \emph{trace}  \\ \hline
+\verb"-"      &               &                &                &                &               \\ 
+\verb"n"      & $\bullet$     &                &                &                &               \\ 
+\verb"nh"     & $\bullet$     & $\bullet$      &                &                &               \\ 
+\verb"nhl"    & $\bullet$     & $\bullet$      & $\bullet$      &                &               \\
+\verb"t"      &               &                &                &                & $\bullet$     \\ 
+\verb"nt"     & $\bullet$     &                &                &                & $\bullet$     \\ 
+\verb"nht"    & $\bullet$     & $\bullet$      &                &                & $\bullet$     \\ 
+\verb"nhlt"   & $\bullet$     & $\bullet$      & $\bullet$      &                & $\bullet$     \\ 
+\verb"nH"     & $\bullet$     & $\bullet$      &                &                &               \\ 
+\verb"nHl"    & $\bullet$     & $\bullet$      & $\bullet$      &                &               \\ \hline
+\end{tabular}
+
+\caption{\setMyFontSize\label{flatHistProversTable}ODProver 
+provers.}
+
+\end{table}
+
+\submodule{Usage (Hugs)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Load the script {\tt ODProver.lhs} into the Hugs
+interpreter. The program should be invoked and
+used the same way as {\tt DProver}.

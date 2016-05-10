@@ -1,0 +1,112 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% script:  DTScale.tex
+%%
+%% created: 29/11/99 by Andrew Rock
+%%
+%% purpose: User's guide for DTScale.
+%%
+
+\module{DTScale} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{DTScaleUser}
+
+The program {\tt DTScale} is used for the generation
+of scalable test theories and for measuring the time
+required for proofs using them.
+
+This program can be run using the Hugs interpreter,
+or compiled with GHC and run directly from the shell.
+Execution time measurement is only possible using
+the GHC compiled version of this program.
+
+\submodule{Usage (GHC)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compile the program by typing {\tt make DTScale}.
+Run the program by typing a command of the form:
+
+\begin{alltt}
+$ DTScale  {\it options theory-name size...} 
+\end{alltt}
+
+\noindent where the options are:
+
+\begin{description}
+   \item[{\tt -t}] Print the theory in \deimos\ syntax and
+      terminate without attempting a proof.
+   \item[{\tt -tp}] Print the theory in \dprolog\ syntax and
+      terminate without attempting a proof.
+   \item[{\tt -td}] Print the theory in \delores\ syntax and
+      terminate without attempting a proof.
+   \item[{\tt -m}] Print the computed metrics (defined
+      in section \ref{theorySizeSection}) for the
+      theory before proving it.
+   \item[{\tt -e} {\it prover}] Use the named {\it prover}
+      engine. See tables \ref{dProverTable} and 
+      \ref{flatHistProversTable} for the names of the
+      provers that are available. The default prover is
+      \verb"nHl".
+   \item[{\tt -o}] Don't use the faster array-based theory
+      representation.
+\end{description}
+
+\noindent Example:
+
+\begin{alltt}
+$ DTScale -t mix 100 10 5
+\end{alltt}
+
+When a proof is requested, statistics about the size of the
+theory, the number of goals and the time required
+for proof are printed.
+
+The theory and the tagged
+literal to use are specified by {\it theory-name} 
+and {\it size}. The mapping from name to theory 
+is given in table~\ref{theoryNameTable}. The scalable
+test theories are described in detail in 
+appendix~\ref{scalableAppendix}. 
+
+\begin{table}[h]
+
+\setMyFontSize
+
+\centering
+
+\renewcommand{\arraystretch}[0]{1.5}
+
+\begin{tabular}{|l|l|l|} \hline
+
+\emph{theory} & \emph{theory name} & \emph{smallest size} \\ \hline
+ \chainTh   & {\tt chain}    & {\tt 0} \\ \hline
+ \chainSTh  & {\tt chains}   & {\tt 0} \\ \hline
+ \circleTh  & {\tt circle}   & {\tt 1} \\ \hline
+ \circleSTh & {\tt circles}  & {\tt 1} \\ \hline
+ \levelsTh  & {\tt levels}   & {\tt 0} \\ \hline
+ \levelsMTh & {\tt levels-}  & {\tt 0} \\ \hline
+ \teamsTh   & {\tt teams}    & {\tt 0} \\ \hline
+ \treeTh    & {\tt tree}     & {\tt 1 1} \\ \hline
+ \dagTh     & {\tt dag}      & {\tt 1 1} \\ \hline
+ \mixTh     & {\tt mix}      & {\tt 1 0 0} \\ \hline
+\end{tabular}
+
+\caption{\setMyFontSize\label{theoryNameTable} Names
+for specifying scalable test theories, and the smallest
+size parameters permitted for each theory.}
+
+\end{table}
+
+\submodule{Usage (Hugs)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Load the script {\tt DTScale.lhs} into the Hugs
+interpreter. At the Hugs prompt, type the expression 
+{\tt run} {\it args}, where  {\it args} is a string
+containing the command line arguments as described 
+above for the compiled version. Example:
+
+\begin{alltt}
+Hugs> run "-p nhlt tree 5 3"
+\end{alltt}
+

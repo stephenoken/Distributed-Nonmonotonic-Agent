@@ -1,0 +1,237 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% script:  DProver.tex
+%%
+%% created: 16/11/99 by Andrew Rock
+%%
+%% purpose: User's guide for DefeasibleParser.
+%%
+
+\module{DProver} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{DProverUser}
+
+The program {\tt DProver} is the query answering
+prover with the simplest (and slowest) implementation. 
+This program is maintained as a test-bed for new 
+features as it is simpler and quicker to 
+modify than the other prover programs constituting
+\deimos. Current features available to this prover,
+but not to others, include:
+
+\begin{itemize}
+   \item provers with well-founded semantics; and
+   \item run-files.
+\end{itemize}
+
+This program can be run using the Hugs interpreter,
+or compiled with GHC and run directly from the shell.
+
+
+
+\submodule{Usage (GHC)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Run the program by typing a command of the form:
+
+\begin{alltt}
+$ DProver\it options\tt [\it{theory-file-name}\tt [\it{tagged-literal}\tt]]
+\end{alltt}
+
+\noindent where the options are:
+
+\begin{description}
+   \item[{\tt -t}] Print the theory in \deimos\ syntax and
+      terminate.
+   \item[{\tt -tp}] Print the theory in \dprolog\ syntax
+      and terminate.
+   \item[{\tt -td}] Print the theory in \delores\ syntax
+      and terminate.
+   \item[{\tt -e} {\it prover}] Use the named {\it prover} engine.
+      See table~\ref{dProverTable} for the names of the
+      prover engines that are available. The default prover engine is
+      \verb"nhlt".
+   \item[{\tt -r} {\it run-file}] Use the named {\it run-file} to
+      generate a truth table and terminate.
+\end{description}
+
+\noindent If a theory file name is supplied on the
+command line, that theory will be loaded. Otherwise when the
+program starts it will prompt for the name of a theory file
+to load. If there is a tagged literal supplied on the command
+line, then that proof will be attempted and the program
+will terminate upon its completion. If the {\tt -r} option
+is specified and a {\it run-file} name is supplied, then
+all the proofs specified by the runfile are attempted,
+and then a truth table will be printed. Otherwise the
+program will prompt for and handle commands.
+
+When a theory is loaded it is parsed and checked for
+consistency. If these checks fail an error message will
+be printed and another file name promped for.
+
+When a theory has been loaded successfully, the program
+prompts for commands with \verb"|-". The following commands
+are accepted:
+
+\begin{description}
+   \item[{\tt ?}] Print the list of commands.
+   \item[{\tt q}] Quit the program.
+   \item[{\tt t}] Print the theory in \deimos\ syntax.
+   \item[{\tt tp}] Print the theory in \dprolog\ syntax.
+   \item[{\tt td}] Print the theory in \delores\ syntax.
+   \item[{\tt f}] Forget the history of subgoals
+      accumulated so far.
+   \item[{\tt e}] Identify the current prover engine.
+   \item[{\tt e~}{\it engine}] Select a prover {\it engine}.
+   \item[{\tt l~[{\it file-name}]}] Load a new theory file
+     [named {\it file-name}].
+   \item[{\it tagged-literal}] Answer {\it tagged-literal}
+      by attempting a proof.
+   \item[{\tt r~[{\it run-file}]}] Run the named run-file, 
+      printing a table of results.
+\end{description}
+
+Tagged literals are described in 
+section~\ref{taggedLitSection}. The prover engines that can be 
+selected with the {\tt e} command are listed in 
+table~\ref{dProverTable}. The different provers feature
+combinations of goal counting, avoiding recomputation
+by maintaining a history of prior results, loop detection,
+well-founded semantics, 
+and trace printing. The default prover is \verb"nhlt".
+
+\begin{table}[h]
+
+\setMyFontSize
+
+\centering
+
+% \renewcommand{\arraystretch}[0]{1.5}
+
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+
+\emph{prover} & \emph{counts} & \emph{keeps}   & \emph{detects} & \emph{well-}   & \emph{prints} \\ 
+\emph{name}   & \emph{goals}  & \emph{history} & \emph{loops}   & \emph{founded} & \emph{trace}  \\ \hline
+\verb"-"      &               &                &                &                &               \\ 
+\verb"n"      & $\bullet$     &                &                &                &               \\ 
+\verb"nh"     & $\bullet$     & $\bullet$      &                &                &               \\ 
+\verb"nhl"    & $\bullet$     & $\bullet$      & $\bullet$      &                &               \\
+\verb"nhlw"   & $\bullet$     & $\bullet$      & $\bullet$      & $\bullet$      &               \\
+\verb"t"      &               &                &                &                & $\bullet$     \\ 
+\verb"nt"     & $\bullet$     &                &                &                & $\bullet$     \\ 
+\verb"nht"    & $\bullet$     & $\bullet$      &                &                & $\bullet$     \\ 
+\verb"nhlt"   & $\bullet$     & $\bullet$      & $\bullet$      &                & $\bullet$     \\ 
+\verb"nhlwt"  & $\bullet$     & $\bullet$      & $\bullet$      & $\bullet$      & $\bullet$     \\ \hline
+\end{tabular}
+
+\caption{\setMyFontSize\label{dProverTable}DProver 
+provers.}
+
+\end{table}
+
+
+\submodule{Usage (Hugs)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Load the script {\tt DProver.lhs} into the Hugs
+interpreter. At the Hugs prompt, type the expression 
+
+\begin{alltt}
+Hugs> run "\emph{options} [\emph{theory-file-name} [\emph{tagged-literal}]]"
+\end{alltt}
+
+\noindent The program then behaves as descibed for GHC.
+
+
+\submodule{Run-files} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A theory may be tested by augmentation by combinations of extra facts,
+generating a summary table of results. {\tt DProver}
+reads a file, a {\it run-file} to specify the combinations
+of facts to test with and the proofs to attempt.
+
+A run-file consists of a sequence of statements
+that specify the literals to assert as facts,
+the combinations of literals to ignore, and the 
+proofs to attempt for each combination of inputs.
+
+The syntax of a run-file is summarized as follows.
+
+\begin{Verbatim}
+run-file ::= {(input | ignore | output) "." }
+
+input ::= "input" "{" literal {"," literal} "}"
+
+ignore ::= "ignore"  "{" literal {"," literal} "}"
+
+output ::= "output" "{" taggedLiteral "}"
+\end{Verbatim}
+
+All literals in a run-file must be grounded.
+Comments are permitted, with the same syntax
+as for theory files.
+
+An {\tt input} statement usually contains one
+literals. If two or more literals are present
+in a single input statement,
+then they are mutually exclusive. Examples are
+shown in table~\ref{inputTable}.
+An {\tt ignore} statement rules out specific
+combinations of facts. An example is shown in 
+table~\ref{inputTable}.
+An {\tt output} statement specifies a proof to attempt
+for each combination of literals.
+A run-file will produce a summary table of results.
+The results will be abbreviated as shown in table~\ref{abbrTable}.
+
+\begin{table}[h]
+
+\setMyFontSize
+
+{
+
+\centering
+
+\begin{tabular}{|l|l|}                                                              \hline
+\emph{statements}                                     & \emph{facts generated}   \\ \hline
+{\tt input\char`\{a\char`\}. input\char`\{b\char`\}.} & {\tt ~a. ~b.}            \\
+                                                      & {\tt ~a. \~{}b.}         \\
+                                                      & {\tt \~{}a. ~b.}         \\
+                                                      & {\tt \~{}a. \~{}b.}      \\ \hline
+{\tt input\char`\{a, b\char`\}.}                       & {\tt ~a. \~{}b.}         \\
+                                                      & {\tt \~{}a. ~b.}         \\ \hline
+{\tt input\char`\{a, \~{}b\char`\}.}                   & {\tt ~a. ~b.}            \\
+                                                      & {\tt \~{}a. \~{}b.}      \\ \hline
+{\tt input\char`\{a\char`\}. input\char`\{b\char`\}. ignore\char`\{a, \~{}b\char`\}.} 
+                                                      & {\tt ~a. ~b.}            \\
+                                                      & {\tt \~{}a. ~b.}         \\
+                                                      & {\tt \~{}a. \~{}b.}      \\ \hline
+\end{tabular}
+
+}
+
+\caption{\label{inputTable} Example input and ignore statements
+and the combinations of facts generated.}
+
+\end{table}
+
+\begin{table}[h]
+
+\setMyFontSize
+
+{
+
+\centering
+
+\begin{tabular}{|l|l|}                 \hline
+\emph{Result} & \emph{abbreviation} \\ \hline
+Proved        & {\tt P}             \\
+Not Proved    & {\tt N}             \\
+Loops         & {\tt L}             \\ \hline
+\end{tabular}
+
+}
+
+\caption{\label{abbrTable} Abbreviated proof results.}
+
+\end{table}

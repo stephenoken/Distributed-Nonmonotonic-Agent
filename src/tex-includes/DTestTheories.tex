@@ -1,0 +1,348 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% file:    DTestTheories.tex
+%%
+%% created: 26/11/99 by Andrew Rock
+%%
+%% purpose: A description of our scalable test theories 
+%%
+
+{
+
+   \setlength{\arraycolsep}{0.25em}
+
+This appendix specifies the scalable test theories
+used to test the performance of \deimos\ system
+components.
+
+\subsection{Chain Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{chainTheories}
+
+Chain theories \chainTh\ start with
+fact $a_{0}$ and continue 
+with a chain of $n$ defeasible rules of the form
+$a_{i-1} \Rightarrow a_{i}$. 
+A proof of $+\partial a_{n}$ will use all of the
+rules and the fact.
+
+\[\mathbf{chain}(n) = \left\{
+\begin{array}{rlll}
+       &           & &          a_{0} \\
+r_{1}: & a_{0}  & \Rightarrow & a_{1} \\
+r_{2}: & a_{1}  & \Rightarrow & a_{2} \\
+\multicolumn{4}{c}{\vdots}          \\
+r_{n}: & a_{n-1} & \Rightarrow & a_{n}
+\end{array}\right. \]
+
+A variant \chainSTh\ uses only strict rules.
+
+\[\mathbf{chain^{s}}(n) = \left\{
+\begin{array}{rlll}
+       &        & &             a_{0} \\
+r_{1}: & a_{0} &  \rightarrow & a_{1} \\
+r_{2}: & a_{1} &  \rightarrow & a_{2} \\
+\multicolumn{4}{c}{\vdots}          \\
+r_{n}: & a_{n-1} & \rightarrow & a_{n}
+\end{array}\right. \]
+
+\longForm{The implementation of functions that generate
+chain theories is given in
+section~\ref{chainTheoriesImpl}.}
+
+
+\subsection{Circle Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{circleTheories}
+
+Circle theories \circleTh\ consist of $n$
+defeasible rules $a_{i} \Rightarrow a_{(i+1) \bmod n}$.
+
+\[\mathbf{circle}(n) = \left\{
+\begin{array}{rlll}
+r_{0}: & a_{0} &  \Rightarrow & a_{1} \\
+r_{1}: & a_{1} &  \Rightarrow & a_{2} \\
+\multicolumn{4}{c} \vdots          \\
+r_{n-1}: & a_{n-1} & \Rightarrow & a_{0}
+\end{array}\right. \]
+
+Any proof of $+\partial a_{i}$ will loop.
+A variant \circleSTh\ uses only strict
+rules.
+
+\[\mathbf{circle^{s}}(n) = \left\{
+\begin{array}{rlll}
+r_{0}: & a_{0} &  \rightarrow & a_{1} \\
+r_{1}: & a_{1} &  \rightarrow & a_{2} \\
+\multicolumn{4}{c} \vdots          \\
+r_{n-1}: & a_{n-1} & \rightarrow & a_{0}
+\end{array}\right. \]
+
+\longForm{The implementation of functions that generate
+circle theories is given in
+section~\ref{circleTheoriesImpl}.}
+
+
+\subsection{Levels Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{levelsTheories}
+
+Levels theories \levelsTh\ consist of a cascade
+of $2n+2$ disputed conclusions $a_{i}$, $i \in [0..2n+1]$.
+For each $i$, there are rules $\Rightarrow a_{i}$ and
+$a_{i+1} \Rightarrow \neg a_{i}$. For each odd $i$ a priority
+asserts that the latter rule is superior. A final rule
+$ \Rightarrow a_{2n+2}$ gives uncontested support
+for $a_{2n+2}$.
+
+\[\mathbf{levels}(n) = \left\{\begin{array}{rlll}
+
+   r_{0}:    & \{\}     & \Rightarrow & a_{0}          \\
+   r_{1}:    & a_{1}    & \Rightarrow & \neg a_{0}     \\ \hline
+   
+   r_{2}:    & \{\}     & \Rightarrow & a_{1}          \\
+   r_{3}:    & a_{2}    & \Rightarrow & \neg a_{1}     \\
+   \multicolumn{4}{c}{r_{3} > r_{2}}                   \\ \hline
+   
+   r_{4}:    & \{\}     & \Rightarrow & a_{2}          \\
+   r_{5}:    & a_{3}    & \Rightarrow & \neg a_{2}     \\ \hline
+
+   \multicolumn{4}{c}{\vdots}                          \\ \hline
+
+   r_{4n+2}: & \{\}     & \Rightarrow & a_{2n+1}       \\
+   r_{4n+3}: & a_{2n+2} & \Rightarrow & \neg a_{2n+1}  \\
+   \multicolumn{4}{c}{r_{4n+3} > r_{4n+2}}             \\ \hline
+   
+   r_{4n+4}: & \{\}     & \Rightarrow & a_{2n+2}
+
+\end{array}\right.\]
+
+A proof of $+\partial a_{0}$ will use every rule and 
+priority. A variant \levelsMTh\ omits the priorities.
+
+\longForm{The implementation of functions that generate
+levels theories is given in
+section~\ref{levelsTheoriesImpl}.}
+
+
+\subsection{Teams Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{teamsTheories}
+
+Teams theories \teamsTh\ consist of
+conclusions $a_{i}$ which are supported by a team
+two defeasible rules and attacked by another team
+of two defeasible rules. Priorities ensure that each
+attacking rule is beaten by one of the supporting rules.
+The antecedents of these rules are in turn supported
+and attacked by cascades of teams of rules.
+
+\[\mathbf{teams}(n) = \mathbf{block}(a_{0},n)\]
+
+\noindent where, if $p$ is a literal, and $r_{1}, \ldots
+, r_{4}$ are new unique labels:
+
+\[\mathbf{block}(p,0) =  \left\{ \begin{array}{rlll} 
+      r_{1}: & \{\} &  \Rightarrow & p  \\
+      r_{2}: & \{\} &  \Rightarrow & p  \\
+      r_{3}: & \{\} &  \Rightarrow & \neg p  \\
+      r_{4}: & \{\} &  \Rightarrow & \neg p  \\
+      \multicolumn{4}{c}{r_{1} > r_{3}}       \\
+      \multicolumn{4}{c}{r_{2} > r_{4}}       
+   \end{array} \right.\]
+
+\noindent and, if $n > 0$, 
+$a_{1}, \ldots ,a_{4}$ are new unique literals,
+and $r_{1}, \ldots ,r_{4}$ are new unique labels:
+
+\[\mathbf{block}(p,n) =  
+   \left\{ \begin{array}{rlll} 
+      r_{1}: & a_{1} & \Rightarrow & p                \\
+      r_{2}: & a_{2} & \Rightarrow & p                \\
+      r_{3}: & a_{3} & \Rightarrow & \neg p            \\
+      r_{4}: & a_{4} & \Rightarrow & \neg p            \\
+      \multicolumn{4}{c}{r_{1} > r_{3}}             \\
+      \multicolumn{4}{c}{r_{2} > r_{4}}             \\
+      \multicolumn{4}{c}{\mathbf{block}(a_{1},n-1)} \\
+      \multicolumn{4}{c}{\mathbf{block}(a_{2},n-1)} \\
+      \multicolumn{4}{c}{\mathbf{block}(a_{3},n-1)} \\
+      \multicolumn{4}{c}{\mathbf{block}(a_{4},n-1)} 
+   \end{array} \right.\]
+
+A proof of $+\partial a_{0}$ will use every rule and 
+priority.
+
+\longForm{The implementation of functions that generate
+teams theories is given in
+section~\ref{teamsTheoriesImpl}.}
+
+
+\subsection{Tree Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{treeTheories}
+
+In tree theories \treeTh\, $a_{0}$ is at
+the root of a $k$-branching tree of depth $n$ in which
+every literal occurs once.
+
+\[\mathbf{tree}(n,k) = \mathbf{block}(a_{0},n, k)\]
+
+\noindent where, if $p$ is a literal, $n > 0$, $r$
+is a new unique label, and $a_{1}, a_{2}, \ldots ,
+a_{k}$ are new unique literals:
+
+\[\mathbf{block}(p,n,k) =  \left\{ \begin{array}{rllllll} 
+   r: &  a_{1}, & a_{2}, & \ldots , & a_{k} & \Rightarrow & p \\
+   \multicolumn{7}{c}{\mathbf{block}(a_{1},n-1,k)}  \\
+   \multicolumn{7}{c}{\mathbf{block}(a_{2},n-1,k)}  \\
+   \multicolumn{7}{c}{\vdots}                        \\
+   \multicolumn{7}{c}{\mathbf{block}(a_{k},n-1,k)}  
+\end{array} \right.\]
+
+\noindent and: 
+
+\[\mathbf{block}(p,0,k) = \left\{ p \right.\]
+
+A proof of $+\partial a_{0}$ will use every rule and 
+fact.
+
+\longForm{The implementation of functions that generate
+tree theories is given in
+section~\ref{treeTheoriesImpl}.}
+
+
+\subsection{Directed Acyclic Graph Theories} %%%%%%%%%%%%%
+
+\label{dagTheories}
+
+In directed acyclic graph theories \dagTh,
+$a_{0}$ is at the root of a $k$-branching tree of
+depth $n$ in which every literal occurs $k$ times.
+
+\[\mathbf{dag}(n,k) =  \left\{ \begin{array}{rllllll}
+   & & & & & & a_{kn+1} \\
+   & & & & & & a_{kn+2} \\
+   \multicolumn{7}{c}{\vdots} \\
+   & & & & & & a_{kn+k} \\
+   r_{0}: & a_{1}, & a_{2}, & \ldots , & a_{k} & \Rightarrow & a_{0} \\
+   r_{1}: & a_{2}, & a_{3}, & \ldots , & a_{k+1} & \Rightarrow & a_{1} \\
+   \multicolumn{7}{c}{\vdots} \\
+   r_{nk}: & a_{nk+1}, & a_{nk+2}, & \ldots , & a_{nk+k} & \Rightarrow & a_{nk} \\
+\end{array} \right.\]
+
+A proof of $+\partial a_{0}$ will use every rule and 
+fact.
+
+\longForm{The implementation of functions that generate
+directed acyclic graph theories is given in
+section~\ref{dagTheoriesImpl}.}
+
+
+\subsection{Mix Theories} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{mixTheories}
+
+In mix theories \mixTh\ there are $m$
+defeasible rules for conclusion $p$ and $m$ defeaters
+against $p$, where each rule has $n$ unique literals
+as antecedents. Each antecedent literal can be strictly
+established by a chain of strict rules of length $k$.
+A proof of $+\partial p$ uses all the rules and facts.
+
+\[\mathbf{mix}(m,n,k) =  \left\{ \begin{array}{rllllll}
+   r_{1}: & a_{1,1}, & a_{1,2}, & \ldots, & a_{1,n} & \Rightarrow & p \\
+   r_{2}: & a_{2,1}, & a_{2,2}, & \ldots, & a_{2,n} & \Rightarrow & p \\
+   \multicolumn{7}{c}{\vdots} \\
+   r_{m}: & a_{m,1}, & a_{m,2}, & \ldots, & a_{m,n} & \Rightarrow & p \\
+   r_{m+1}: & a_{m+1,1}, & a_{m+1,2}, & \ldots, & a_{m+1,n} & \leadsto & \neg p \\
+   r_{m+2}: & a_{m+2,1}, & a_{m+2,2}, & \ldots, & a_{m+2,n} & \leadsto & \neg p \\
+   \multicolumn{7}{c}{\vdots} \\
+   r_{2m}: & a_{2m,1}, & a_{2m,2}, & \ldots, & a_{2m,n} & \leadsto & \neg p \\
+   \multicolumn{7}{c}{\mathbf{strictChain}(a_{1,1},k)} \\
+   \multicolumn{7}{c}{\vdots} \\
+   \multicolumn{7}{c}{\mathbf{strictChain}(a_{2m,n},k)}
+\end{array} \right.\]
+
+\noindent where:
+
+\[\mathbf{strictChain}(a_{i,j},0) =  \left\{ \begin{array}{l}
+   a_{i,j}
+\end{array} \right.\]
+
+\noindent or, if $k > 0$:
+
+\[\mathbf{strictChain}(a_{i,j},k) =  \left\{ \begin{array}{rlll}
+   & & & b_{i,j,1} \\
+   r_{i,j,1}: & b_{i,j,1} & \Rightarrow & b_{i,j,2} \\
+   r_{i,j,2}: & b_{i,j,2} & \Rightarrow & b_{i,j,3} \\
+   \multicolumn{4}{c}{\vdots} \\
+   r_{i,j,k-1}: & b_{i,j,k-1} & \Rightarrow & b_{i,j,k} \\
+   r_{i,j,k}: & b_{i,j,k} & \Rightarrow & a_{i,j} 
+\end{array} \right.\]
+
+\longForm{The implementation of functions that generate
+mix theories is given in
+section~\ref{mixTheoriesImpl}.}
+
+
+\subsection{Theory Sizes} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{theorySizeSection}
+
+\begin{table*}[t]
+   \centering
+
+   \renewcommand{\arraystretch}[0]{1.5}
+
+   \setMyFontSize
+
+   \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      \emph{theory} & \emph{facts} & \emph{rules}             & \emph{priorities}      & \emph{size}                            \\ 
+      \hline
+      \chainTh      & 1            & $n$                      & 0                      & $2n + 1$                               \\
+      \chainSTh     & 1            & $n$                      & 0                      & $2n + 1$                               \\ 
+      \hline
+      \circleTh     & 0            & $n$                      & 0                      & $2n$                                   \\
+      \circleSTh    & 0            & $n$                      & 0                      & $2n$                                   \\ 
+      \hline
+      \levelsTh     & 0            & $4n+5$                   & $n+1$                  & $7n+8$                                 \\
+      \levelsMTh    & 0            & $4n+5$                   & 0                      & $6n+7$                                 \\ 
+      \hline
+      \teamsTh      & 0            & $4 \sum_{i=0}^{n} 4^i$   & $2 \sum_{i=0}^{n} 4^i$ & $10 \sum_{i=0}^{n-1} 4^i + 6 (4^{n})$  \\
+      \hline 
+      \treeTh       & $k^{n}$      & $\sum_{i=0}^{n-1} k^{i}$ & 0                      & $(k+1) \sum_{i=0}^{n-1} k^{i} + k^{n}$ \\
+      \hline
+      \dagTh        & $k$          & $nk + 1$                 & 0                      & $nk^{2} + (n+2)k + 1$                  \\
+      \hline
+      \mixTh        & $2mn$        & $2m + 2mnk$              & 0                      & $2m + 4mn + 4mnk$                      \\
+      \hline
+   \end{tabular}
+      
+   \caption{\setMyFontSize\label{theorySizeTable}
+   Sizes of scalable test theories}
+
+\end{table*}
+
+A \deimos\ theory can be characterized by various metrics that
+give an indication of the size or complexity of the theory.
+These metrics might be used to estimate the memory required to
+store a theory or estimate the time taken to respond to
+queries to them.
+
+Table~\ref{theorySizeTable} lists the formulae that predict these metrics for the 
+scalable test theories described above. The metrics reported
+are:
+
+\begin{description}
+   \item[facts] the number of facts in the theory;
+   \item[rules] the number of rules in the theory;
+   \item[priorities] the number of priorities in the theory; and
+   \item[size] the overall ``size'' of the theory, defined as
+      the sum of the numbers of facts, rules, priorities
+      and literals in the bodies of all rules.
+\end{description}
+
+}

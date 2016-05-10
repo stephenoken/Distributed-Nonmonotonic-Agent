@@ -1,0 +1,70 @@
+%        1         2         3         4         5         6         7         8
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+%% 
+%% script:  DefeasibleParser.tex
+%%
+%% created: 16/11/99 by Andrew Rock
+%%
+%% purpose: User's guide for DefeasibleParser.
+%%
+
+\module{DefeasibleParser} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\label{defParserUser}
+
+The program {\tt DefeasibleParser} is a test program that
+exercises the lexers and parsers required to parse 
+a defeasible theory. It can be used as a quick syntax
+checker for defeasible theory files.
+This program can be run using the Hugs interpreter,
+or compiled with GHC and run directly from the shell.
+
+
+\submodule{Usage (GHC)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Run the program with the command
+
+\begin{alltt}
+$ DefeasibleParser \emph{path1} \emph{path2} ... 
+\end{alltt}
+
+\noindent where \emph{path}, \emph{path2}, ... are the
+paths to each of the theory files to be parsed.
+For each file the program will display the
+name of the file and either a syntax error message or, if
+the file parsed correctly, the regenerated theory.
+A check for cycles in the priority relation
+is performed. If there are cycles, the priorities 
+involved are printed.
+If there are no cycles an attempt is made to remove
+all variables by generating ground instances of them
+using all of the constants appearing in the theory. The
+grounded theory is printed.
+
+If no paths are
+supplied on the command line, then standard input will
+be read and parsed.
+
+
+\submodule{Usage (Hugs)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Load the script {\tt DefeasibleParser.lhs} into the Hugs
+interpreter. To test the parser on one description file,
+type the expression
+
+\begin{alltt}
+Hugs> run1 "\emph{path}"
+\end{alltt}
+
+\noindent where \emph{path} is the path to the
+theory file. To test the parser on a list of files,
+type the expression
+
+\begin{alltt}
+Hugs> run ["\emph{path1}", "\emph{path2}", ... ]
+\end{alltt}
+
+\noindent Standard input will not be parsed if that
+list is empty, otherwise the program will then behave
+as described for GHC.
