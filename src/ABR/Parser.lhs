@@ -28,9 +28,9 @@ analysis and parsing using parser combinators
 \begin{code}
 module ABR.Parser (
       Msg, Could(Fail, Error, OK), Analyser, succeedA,
-      epsilonA, failA, errorA, ( <|> ), ( <*> ), ( @> ), (
+      epsilonA, failA, errorA, ( <|> ), ( ABR.Parser.<*> ), ( @> ), (
       #> ), cons, some, many, optional, someUntil,
-      manyUntil, ( *> ), ( <* ), alsoSat, alsoNotSat,
+      manyUntil, ( ABR.Parser.*> ), ( ABR.Parser.<* ), alsoSat, alsoNotSat,
       dataSatisfies, dataSatisfies', total, nofail,
       nofail', preLex, Lexeme, Tag, Lexer, TLP, TLPs,
       satisfyL, literalL, ( %> ), ( <**> ), ( <++> ), ( *%>
@@ -264,7 +264,7 @@ someUntil a1 a2 input = case a2 input of
    Fail _ _ ->
       ((a1 ABR.Parser.<*> manyUntil a1 a2) @> cons) input
    Error _ _ ->
-      ((a1 <*> manyUntil a1 a2) @> cons) input
+      ((a1 ABR.Parser.<*> manyUntil a1 a2) @> cons) input
 manyUntil a1 a2 = someUntil a1 a2 <|> succeedA []
 \end{code}
 
@@ -281,7 +281,7 @@ a1 *> a2 = a1 ABR.Parser.<*> a2 @> snd
 
 \begin{code}
 ( <* ) :: Analyser a b -> Analyser a c -> Analyser a b
-a1 <* a2 = a1 <*> a2 @> fst
+a1 <* a2 = a1 ABR.Parser.<*> a2 @> fst
 \end{code}
 
 \noindent \highlighttt{alsoSat}~$a_{1}~a_{2}$
@@ -506,7 +506,7 @@ returned is the first position.
 
 \begin{code}
 ( <**> ) :: Lexer -> Lexer -> Lexer
-l1 <**> l2 = (l1 <*> l2) @> f
+l1 <**> l2 = (l1 ABR.Parser.<*> l2) @> f
    where
    f (x,[]) = x
    f ([],x) = x
@@ -521,7 +521,7 @@ lists of lexemes produced by each Lexer.
 
 \begin{code}
 ( <++> ) :: Lexer -> Lexer -> Lexer
-l1 <++> l2 = l1 <*> l2 @> (uncurry (++))
+l1 <++> l2 = l1 ABR.Parser.<*> l2 @> (uncurry (++))
 \end{code}
 
 \noindent $l$~\highlighttt{*\%>}~$\mathit{tag}$

@@ -13,7 +13,7 @@ module DProve(
 \end{code}
 
 \begin{code}
-import CPUTime
+import System.CPUTime
 \end{code}
 
 \begin{code}
@@ -55,7 +55,7 @@ instance DefeasibleLogic DTheory LabeledRule Literal where
 
 \begin{code}
    rsdq (Theory _ rs _) q
-      = filter (\r -> (isStrict r || isPlausible r) 
+      = filter (\r -> (isStrict r || isPlausible r)
                 && consequent r == q) rs
 \end{code}
 
@@ -80,10 +80,10 @@ instance DefeasibleLogic DTheory LabeledRule Literal where
 {\tt r} is the result of trying to prove tagged literal
 {\tt tl} with theory {\tt t}. This is the simplest prover,
 with no trace, no history and therefore no loop checking,
-and not well founded. 
+and not well founded.
 
 \begin{code}
-prove_ :: Theory -> Tagged Literal 
+prove_ :: Theory -> Tagged Literal
 	  -> ThreadedTest Maybe ProofResult ()
 prove_ t tl () = (t |-- tl) prove_ ()
 \end{code}
@@ -95,7 +95,7 @@ prove_ t tl () = (t |-- tl) prove_ ()
 of subgoals required to do so.
 
 \begin{code}
-prove_n :: Theory -> Tagged Literal 
+prove_n :: Theory -> Tagged Literal
 	   -> ThreadedTest Maybe ProofResult Int
 prove_n t tl ng = do
    (r, ng') <- (t |-- tl) prove_n ng
@@ -108,7 +108,7 @@ where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}. A trace is printed.
 
 \begin{code}
-prove_t :: Theory -> Tagged Literal 
+prove_t :: Theory -> Tagged Literal
 	   -> ThreadedTest IO ProofResult String
 prove_t t tl indent = do
    putStrLn (indent ++ "To Prove: " ++ show tl)
@@ -125,7 +125,7 @@ literal {\tt tl} with theory {\tt t} and {\tt ng} is the
 number of subgoals required to do so. A trace is printed.
 
 \begin{code}
-prove_nt :: Theory -> Tagged Literal 
+prove_nt :: Theory -> Tagged Literal
 	    -> ThreadedTest IO ProofResult (Int,String)
 prove_nt t tl (ng,indent) = do
    putStrLn (indent ++ "To Prove: " ++ show tl)
@@ -136,7 +136,7 @@ prove_nt t tl (ng,indent) = do
 \end{code}
 
 
-This type is shorthand for the history that maps 
+This type is shorthand for the history that maps
 tagged literals to prior results.
 
 \begin{code}
@@ -147,13 +147,13 @@ type Hist = History (Tagged Literal) ProofResult
 \verb"prove_nh t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, but
 does not perform loop checking.
 
 \begin{code}
-prove_nh :: Theory -> Tagged Literal 
+prove_nh :: Theory -> Tagged Literal
 	    -> ThreadedTest Maybe ProofResult (Int, Hist)
 prove_nh t tl (ng,h) = case getResult h tl of
    Just r ->
@@ -175,11 +175,11 @@ checking. A trace is printed.
 
 \begin{code}
 prove_nht
-   :: Theory -> Tagged Literal 
+   :: Theory -> Tagged Literal
       -> ThreadedTest IO ProofResult (Int,Hist,String)
 prove_nht t tl (ng,h,indent) = case getResult h tl of
    Just r -> do
-      putStrLn (indent ++ show r ++ " previously: " 
+      putStrLn (indent ++ show r ++ " previously: "
                 ++ show tl)
       return (r, (ng,h,indent))
    Nothing -> do
@@ -194,13 +194,13 @@ prove_nht t tl (ng,h,indent) = case getResult h tl of
 \verb"prove_nhl t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, and
 performs loop checking.
 
 \begin{code}
-prove_nhl :: Theory -> Tagged Literal 
+prove_nhl :: Theory -> Tagged Literal
 	    -> ThreadedTest Maybe ProofResult (Int, Hist)
 prove_nhl t tl (ng,h) = case getResult h tl of
    Just Pending ->
@@ -218,7 +218,7 @@ prove_nhl t tl (ng,h) = case getResult h tl of
 \verb+(r,(ng,h',""))+,
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, and
 performs loop checking. A trace is printed.
@@ -250,7 +250,7 @@ prove_nhlt t tl (ng,h,indent) = case getResult h tl of
 
 \submodule{Provers with well-founded semantics} %%%%%%%%%%%%%
 
-This type is shorthand for the history that maps 
+This type is shorthand for the history that maps
 tagged literals to prior well-founded results.
 
 \begin{code}
@@ -260,13 +260,13 @@ type WFHist = History (Tagged Literal) WFResult
 \verb"prove_nhlw t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs,
 performs loop checking, and has well-founded semantics.
 
 \begin{code}
-prove_nhlw :: Theory -> Tagged Literal 
+prove_nhlw :: Theory -> Tagged Literal
    -> ThreadedTest Maybe WFResult (Int, WFHist)
 prove_nhlw t tl (ng,h) = case getResult h tl of
    Just WFPending ->
@@ -284,12 +284,12 @@ prove_nhlw t tl (ng,h) = case getResult h tl of
 \verb+(r,(ng,h',""))+,
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs,
 performs loop checking, and has well-founded semantics.
 A trace is printed.
- 
+
 \begin{code}
 prove_nhlwt :: Theory -> Tagged Literal
    -> ThreadedTest IO WFResult (Int, WFHist, String)
@@ -324,7 +324,7 @@ proof result as a string are returned.
 prove :: Theory -> Options -> String -> Tagged Literal
          -> Hist -> WFHist -> IO (Hist, WFHist, String)
 prove t options def tl h wh = case lookupBST "e" options of
-      Nothing -> prove t (updateBST (\x _ -> x) "e" 
+      Nothing -> prove t (updateBST (\x _ -> x) "e"
                     (ParamValue def) options) def tl h wh
       Just (ParamValue cs) -> case cs of
          "-"     -> use_prove_ tl
@@ -337,7 +337,7 @@ prove t options def tl h wh = case lookupBST "e" options of
          "nhlt"  -> use_prove_nhlt tl
          "nhlw"  -> use_prove_nhlw tl
          "nhlwt" -> use_prove_nhlwt tl
-         _      -> do 
+         _      -> do
 	    putStrLn $ "Error: No such prover as \""
 	               ++ cs ++ "\""
 	    return (h, wh, "")
@@ -347,7 +347,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       let Just (result,_) = prove_ t tl ()
       putStrLn $ show result ++ "."
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh, show result)
    use_prove_n tl = do
@@ -356,14 +356,14 @@ prove t options def tl h wh = case lookupBST "e" options of
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh, show result)
    use_prove_t tl = do
       time0 <- getCPUTime
       (result,_) <- prove_t t tl ""
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh, show result)
    use_prove_nt tl = do
@@ -371,7 +371,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       (result,(ng,_)) <- prove_nt t tl (0, "")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh, show result)
    use_prove_nh tl = do
@@ -380,7 +380,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', wh, show result)
    use_prove_nht tl = do
@@ -388,7 +388,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       (result,(ng,h',_)) <- prove_nht t tl (0,h,"")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', wh, show result)
    use_prove_nhl tl = do
@@ -397,7 +397,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', wh, show result)
    use_prove_nhlt tl = do
@@ -405,7 +405,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       (result,(ng,h',_)) <- prove_nhlt t tl (0,h,"")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', wh, show result)
    use_prove_nhlw tl = do
@@ -417,7 +417,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       putStrLn $ show result' ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh', show result)
    use_prove_nhlwt tl = do
@@ -429,7 +429,7 @@ prove t options def tl h wh = case lookupBST "e" options of
       putStrLn $ show result' ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, wh', show result)
 \end{code}

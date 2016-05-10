@@ -17,11 +17,11 @@ import ABR.SparseSet; import ABR.Parser; import ABR.DeepSeq
 
 \submodule{Data type definition} %%%%%%%%%%%%%%%%%%%%%%%%%
 
-A {\tt Label} is just a string with a constructor to tag 
+A {\tt Label} is just a string with a constructor to tag
 it as a label.
 
 \begin{code}
-type LabelName = String 
+type LabelName = String
 
 newtype Label = Label LabelName
                 deriving (Eq, Ord)

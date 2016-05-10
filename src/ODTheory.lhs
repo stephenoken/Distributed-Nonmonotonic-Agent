@@ -5,20 +5,20 @@ of Defeasible logic theories that facilitates faster
 proofs.
 
 \begin{code}
-{-# LANGUAGE MultiParamTypeClasses, 
-             TypeSynonymInstances #-}
+{-# LANGUAGE MultiParamTypeClasses,
+             TypeSynonymInstances,FlexibleInstances  #-}
 \end{code}
 
 \begin{code}
 module ODTheory(
       ORule, OPriorities, OTheory, makeOTheory,
       makeOTL, unmakeOTL, showOTL, OHist, oprove,
-      FHist, initPmSyLitHist 
+      FHist, initPmSyLitHist
    ) where
 \end{code}
 
 \begin{code}
-import Control.Monad.ST; import CPUTime
+import Control.Monad.ST; import System.CPUTime
 import Data.Array.ST; import Data.Array
 \end{code}
 
@@ -44,7 +44,7 @@ each literal to {\tt True} (it's a fact) or {\tt False}
 type OFacts = Array OLiteral Bool
 \end{code}
 
-All the rules will be stored in parallel arrays of the 
+All the rules will be stored in parallel arrays of the
 antecedents and consequents. An {\tt ORule} is the index
 type for these arrays.
 
@@ -81,15 +81,15 @@ A complete theory ready to use:
 
 \begin{code}
 data ODTheory rul = OTheory {
-      num2name   :: LitArray, 
+      num2name   :: LitArray,
       name2num   :: LitTree,
-      facts      :: OFacts,       
+      facts      :: OFacts,
       cons       :: OCons,
-      antes      :: OAnts,        
+      antes      :: OAnts,
       plausStart :: ORule,
-      defStart   :: ORule,    
+      defStart   :: ORule,
       priorities :: OPriorities,
-      prsq       :: ORuleTable,   
+      prsq       :: ORuleTable,
       prsdq      :: ORuleTable,
       prq        :: ORuleTable
    }
@@ -108,7 +108,7 @@ being defeaters.
 \submodule{Building an optimized theory} %%%%%%%%%%%%%%%%%
 
 {\tt makeOTheory s t} builds an optimized theory
-using the set of literal names {\tt s} and 
+using the set of literal names {\tt s} and
 theory {\tt t}.
 
 \begin{code}
@@ -124,18 +124,18 @@ makeOTheory s t@(Theory fs rs ps) = let
       n_prs = length prs
       n_drs = length drs
       n_rs = n_srs + n_prs + n_drs
-      cons' = 
-         listArray (OR 0, OR (n_rs - 1)) 
+      cons' =
+         listArray (OR 0, OR (n_rs - 1))
          (map (toOLiteral nam2num . consequent) rs')
       labelTable =
-         pairs2BST $ filter (not . null . fst) 
+         pairs2BST $ filter (not . null . fst)
          $ zip (map (\(Rule (Label l) _) -> l) rs') [0..]
       toRuleIndex :: Label -> ORule
-      toRuleIndex (Label l) = 
+      toRuleIndex (Label l) =
          case lookupBST l labelTable of
             Just i  -> i
             Nothing -> error "toRuleIndex: Label not found"
-      crs = map (\(x,y) -> (y,x)) $ assocs cons' 
+      crs = map (\(x,y) -> (y,x)) $ assocs cons'
    in OTheory {
       num2name = num2nam,
       name2num = nam2num,
@@ -143,24 +143,24 @@ makeOTheory s t@(Theory fs rs ps) = let
          accumArray (\ _ _ -> True) False (-nLit, nLit)
          $ map (\l -> (toOLiteral nam2num l, True)) fs,
       cons = cons',
-      antes = 
-         listArray (OR 0, OR n_rs - 1) (map ((map 
+      antes =
+         listArray (OR 0, OR n_rs - 1) (map ((map
          (toOLiteral nam2num)) . antecedent) rs'),
       plausStart = OR n_srs,
       defStart = OR (n_srs + n_prs),
-      priorities = 
-         mkGraph (OR 0) (OR n_rs - 1) 
-	 (map (\(l1 :> l2) -> 
+      priorities =
+         mkGraph (OR 0) (OR n_rs - 1)
+	 (map (\(l1 :> l2) ->
 	    (toRuleIndex l1, toRuleIndex l2))
           ps),
       prsq =
-         accumArray (flip (:)) [] (- nLit, nLit) 
+         accumArray (flip (:)) [] (- nLit, nLit)
          $ take n_srs crs,
-      prsdq = 
-         accumArray (flip (:)) [] (- nLit, nLit) 
+      prsdq =
+         accumArray (flip (:)) [] (- nLit, nLit)
          $ take (n_srs + n_prs) crs,
       prq = accumArray (flip (:)) [] (- nLit, nLit) crs
-   }   
+   }
 \end{code}
 
 
@@ -231,7 +231,7 @@ instance Show OTheory where
 \end{code}
 
 \begin{code}
-   showsPrec p t = 
+   showsPrec p t =
       showString "num2name: "       . shows (num2name t)
       . showString "\nname2num: "   . shows (name2num t)
       . showString "\nfacts: "      . shows (facts t)
@@ -319,10 +319,10 @@ showOTL ot = show . unmakeOTL ot
 {\tt r} is the result of trying to {\tt oprove} tagged literal
 {\tt tl} with theory {\tt t}. This is the simplest prover,
 with no trace, no history and therefore no loop checking,
-and not well founded. 
+and not well founded.
 
 \begin{code}
-oprove_ :: OTheory -> Tagged OLiteral 
+oprove_ :: OTheory -> Tagged OLiteral
 	  -> ThreadedTest Maybe ProofResult ()
 oprove_ t tl () = (t |-- tl) oprove_ ()
 \end{code}
@@ -334,7 +334,7 @@ oprove_ t tl () = (t |-- tl) oprove_ ()
 of subgoals required to do so.
 
 \begin{code}
-oprove_n :: OTheory -> Tagged OLiteral 
+oprove_n :: OTheory -> Tagged OLiteral
 	   -> ThreadedTest Maybe ProofResult Int
 oprove_n t tl ng = do
    (r, ng') <- (t |-- tl) oprove_n ng
@@ -347,7 +347,7 @@ where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}. A trace is printed.
 
 \begin{code}
-oprove_t :: OTheory -> Tagged OLiteral 
+oprove_t :: OTheory -> Tagged OLiteral
 	   -> ThreadedTest IO ProofResult String
 oprove_t t tl indent = do
    putStrLn (indent ++ "To Prove: " ++ showOTL t tl)
@@ -364,7 +364,7 @@ literal {\tt tl} with theory {\tt t} and {\tt ng} is the
 number of subgoals required to do so. A trace is printed.
 
 \begin{code}
-oprove_nt :: OTheory -> Tagged OLiteral 
+oprove_nt :: OTheory -> Tagged OLiteral
 	    -> ThreadedTest IO ProofResult (Int,String)
 oprove_nt t tl (ng,indent) = do
    putStrLn (indent ++ "To Prove: " ++ showOTL t tl)
@@ -377,7 +377,7 @@ oprove_nt t tl (ng,indent) = do
 
 \submodule{Provers with tree histories} %%%%%%%%%%%%%%%%%%
 
-This type is shorthand for the history that maps 
+This type is shorthand for the history that maps
 tagged literals to prior results.
 
 \begin{code}
@@ -388,13 +388,13 @@ type OHist = History (Tagged OLiteral) ProofResult
 \verb"oprove_nh t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, but
 does not perform loop checking.
 
 \begin{code}
-oprove_nh :: OTheory -> Tagged OLiteral 
+oprove_nh :: OTheory -> Tagged OLiteral
 	    -> ThreadedTest Maybe ProofResult (Int, OHist)
 oprove_nh t tl (ng,h) = case getResult h tl of
    Just r ->
@@ -416,11 +416,11 @@ checking. A trace is printed.
 
 \begin{code}
 oprove_nht
-   :: OTheory -> Tagged OLiteral 
+   :: OTheory -> Tagged OLiteral
       -> ThreadedTest IO ProofResult (Int,OHist,String)
 oprove_nht t tl (ng,h,indent) = case getResult h tl of
    Just r -> do
-      putStrLn (indent ++ show r ++ " previously: " 
+      putStrLn (indent ++ show r ++ " previously: "
                 ++ showOTL t tl)
       return (r, (ng,h,indent))
    Nothing -> do
@@ -435,13 +435,13 @@ oprove_nht t tl (ng,h,indent) = case getResult h tl of
 \verb"oprove_nhl t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, and
 performs loop checking.
 
 \begin{code}
-oprove_nhl :: OTheory -> Tagged OLiteral 
+oprove_nhl :: OTheory -> Tagged OLiteral
 	    -> ThreadedTest Maybe ProofResult (Int, OHist)
 oprove_nhl t tl (ng,h) = case getResult h tl of
    Just Pending ->
@@ -459,7 +459,7 @@ oprove_nhl t tl (ng,h) = case getResult h tl of
 \verb+(r,(ng,h',""))+,
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, and
 performs loop checking.
@@ -495,7 +495,7 @@ from $O(N)$ to $O(N \log N)$. This can be avoided by
 replacing the tree in the history by an array. Accessing
 and {\it updating} the array must however be performed in
 constant time or there will be no speedup. This requires
-mutable arrays, and therefore the ST monad. 
+mutable arrays, and therefore the ST monad.
 
 We must record the results for each possible tagged
 literal. This is essentially a three dimensional structure,
@@ -537,7 +537,7 @@ type FHist = FPmSyLitHist -- F = flat and frozen
 \end{code}
 
 
-An initial history takes some building. 
+An initial history takes some building.
 
 \begin{code}
 initLitHist :: OTheory -> FLitHist
@@ -623,7 +623,7 @@ freezePmSyLitHist (p,m) = do
 \verb"oprove_nH t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, but
 does not perform loop checking.
@@ -631,7 +631,7 @@ does not perform loop checking.
 \begin{code}
 oprove_nH :: OTheory -> Tagged OLiteral
    -> ThreadedTest (ST s) ProofResult (Int, PmSyLitHist s)
-oprove_nH t tl (ng,(p,m)) = do 
+oprove_nH t tl (ng,(p,m)) = do
    r <- case tl of
       Plus  ps q -> readArray (p ! ps) q
       Minus ps q -> readArray (m ! ps) q
@@ -651,7 +651,7 @@ oprove_nH t tl (ng,(p,m)) = do
 \verb"oprove_nHl t tl (0,h)" returns \verb"(r,(ng,h'))",
 where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}, {\tt ng} is the
-number of subgoals required to do so, {\tt h} is 
+number of subgoals required to do so, {\tt h} is
 a history of prior results and \verb"h'" is the final
 history. This prover avoids redoing prior proofs, and
 performs loop checking.
@@ -659,7 +659,7 @@ performs loop checking.
 \begin{code}
 oprove_nHl :: OTheory -> Tagged OLiteral
    -> ThreadedTest (ST s) ProofResult (Int, PmSyLitHist s)
-oprove_nHl t tl (ng,(p,m)) = do 
+oprove_nHl t tl (ng,(p,m)) = do
    r <- case tl of
       Plus  ps q -> readArray (p ! ps) q
       Minus ps q -> readArray (m ! ps) q
@@ -684,38 +684,38 @@ oprove_nHl t tl (ng,(p,m)) = do
 \submodule{Prover selector} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \verb"oprove ls t ot options def tl h fh" uses the prover
-selected by the {\tt e} option in {\tt options}, or 
+selected by the {\tt e} option in {\tt options}, or
 the default indicated by {\tt def} if the {\tt e}
 option is not present, to prove {\tt tl} using {\tt ot}.
 {\tt h} is a tree history of prior results.
 {\tt fh} is a flat (array) history of prior results.
-If the literal in 
+If the literal in
 {\tt tl} is not defined in the present optimized theory,
 i.e. not in {\tt ls}, a new one is built to accommodate it.
 An updated history, literal name set, optimized theory
 and the proof result as a string are returned.
 
 \begin{code}
-oprove :: SparseSet Literal -> Theory -> OTheory 
+oprove :: SparseSet Literal -> Theory -> OTheory
    -> Options -> String -> Tagged Literal
    -> OHist -> FHist
    -> IO (SparseSet Literal, OTheory, OHist, FHist, String)
 oprove ls t ot options def tl h fh = do
       let tls = getLits tl emptySS
-          (ls', ot', fh') 
+          (ls', ot', fh')
               = if tls `isSubSet` ls then
                   (ls, ot, fh)
-               else 
+               else
                   let ns  = tls `unionSS` ls
 		      ot' = makeOTheory ns t
-		      fh'' = extendPmSyLitHist ot' fh 
+		      fh'' = extendPmSyLitHist ot' fh
                   in (ns, ot', fh'')
           otl = makeOTL ot' tl
       case lookupBST "e" options of
-         Nothing -> oprove ls' t ot' (updateBST (\x _ -> x) 
+         Nothing -> oprove ls' t ot' (updateBST (\x _ -> x)
                        "e" (ParamValue def) options)
                        def tl h fh'
-         Just (ParamValue cs) -> do 
+         Just (ParamValue cs) -> do
             (h',fh'',r) <- case cs of
                "-"    -> use_prove_     ot' otl fh'
                "n"    -> use_prove_n    ot' otl fh'
@@ -738,7 +738,7 @@ oprove ls t ot options def tl h fh = do
       let Just (result,_) = oprove_ ot otl ()
       putStrLn $ show result ++ "."
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh', show result)
    use_prove_n ot otl fh' = do
@@ -747,14 +747,14 @@ oprove ls t ot options def tl h fh = do
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh', show result)
    use_prove_t ot otl fh' = do
       time0 <- getCPUTime
       (result,_) <- oprove_t ot otl ""
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh', show result)
    use_prove_nt ot otl fh' = do
@@ -762,7 +762,7 @@ oprove ls t ot options def tl h fh = do
       (result,(ng,_)) <- oprove_nt ot otl (0, "")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh', show result)
    use_prove_nh ot otl fh' = do
@@ -771,7 +771,7 @@ oprove ls t ot options def tl h fh = do
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', fh', show result)
    use_prove_nht ot otl fh' = do
@@ -779,7 +779,7 @@ oprove ls t ot options def tl h fh = do
       (result,(ng,h',_)) <- oprove_nht ot otl (0,h,"")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', fh', show result)
    use_prove_nhl ot otl fh' = do
@@ -788,7 +788,7 @@ oprove ls t ot options def tl h fh = do
       putStrLn $ show result ++ "."
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', fh', show result)
    use_prove_nhlt ot otl fh' = do
@@ -796,7 +796,7 @@ oprove ls t ot options def tl h fh = do
       (result,(ng,h',_)) <- oprove_nhlt ot otl (0,h,"")
       putStrLn $ "Number of goals: " ++ show ng
       time1 <- getCPUTime
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h', fh', show result)
    use_prove_nH ot otl fh' = do
@@ -806,11 +806,11 @@ oprove ls t ot options def tl h fh = do
                 (result,(ng,h')) <- oprove_nH ot otl (0,h)
 	        fh''' <- freezePmSyLitHist h'
 	        return (result,(ng,fh'''))
-	     ) 
+	     )
       putStrLn $ show result ++ "."
       time1 <- getCPUTime
       putStrLn $ "Number of goals: " ++ show ng
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh'', show result)
    use_prove_nHl ot otl fh' = do
@@ -820,11 +820,11 @@ oprove ls t ot options def tl h fh = do
                 (result,(ng,h')) <- oprove_nHl ot otl (0,h)
 	        fh''' <- freezePmSyLitHist h'
 	        return (result,(ng,fh'''))
-	     ) 
+	     )
       putStrLn $ show result ++ "."
       time1 <- getCPUTime
       putStrLn $ "Number of goals: " ++ show ng
-      putStrLn $ "CPU time for proof (s): " 
+      putStrLn $ "CPU time for proof (s): "
          ++ show (fromIntegral(time1 - time0) / 1.0e12)
       return (h, fh'', show result)
 \end{code}

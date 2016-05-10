@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -21,7 +21,7 @@
 \module{Haskell Lexer} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The module \highlighttt{ABR.HaskellLexer} provides facilities to
-partially parse Haskell sources. 
+partially parse Haskell sources.
 
 \begin{code}
 module ABR.HaskellLexer (
@@ -42,14 +42,14 @@ import ABR.Parser.Lexers hiding (floatL, stringL)
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Handling literate scripts} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent \highlighttt{deliterate}~$\mathit{cps}$ removes
 all informal text from $\mathit{cps}$, a literate Haskell
 source as a list of character-position pairs as
-produced by {\tt Parser.preLex}. A similar list of 
+produced by {\tt Parser.preLex}. A similar list of
 character-position pairs is returned. This does not
 remove \verb"--" or \verb"{-" \verb"-}" comments
 from within the formal text. Those comments are
@@ -84,7 +84,7 @@ deliterate = i
    i cps = case cps of
       []                -> []
       (('>',(_,0)):cps) -> f' cps
-      (('\\',p):cps)    -> i1 cps 
+      (('\\',p):cps)    -> i1 cps
       (_:cps)           -> i cps
 \end{code}
 
@@ -117,11 +117,11 @@ deliterate = i
    i10 = ix 'e' i11
    i11 = ix '}' f
 \end{code}
-         
+
 \begin{code}
    f cps = case cps of
       []             -> []
-      (('\\',p):cps) -> f1 [('\\',p)] cps 
+      (('\\',p):cps) -> f1 [('\\',p)] cps
       (cp:cps)       -> cp : f cps
 \end{code}
 
@@ -145,13 +145,13 @@ deliterate = i
    f8 = fx 'e' f9
    f9 = fx '}' (\_ cps -> i cps)
 \end{code}
-   
+
 
 \submodule{Lexing scripts} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This section implements a lexer for Haskell. It is
 essentially complete for ASCII sources, but not for
-unicode sources. 
+unicode sources.
 
 \noindent \highlighttt{programL} performs the
 lexical analysis of any Haskell source. Apply {\tt
@@ -169,8 +169,8 @@ programL = listL [hwhitespaceL, lexemeL]
 
 \begin{code}
 lexemeL :: Lexer
-lexemeL = 
-       varidL <|> conidL <|> varsymL <|> consymL 
+lexemeL =
+       varidL <|> conidL <|> varsymL <|> consymL
    <|> hliteralL <|> specialL <|> reservedopL
    <|> reservedidL
 \end{code}
@@ -205,7 +205,7 @@ hwhitespaceL = (some whitestuffL) *%> " "
 
 \begin{code}
 whitestuffL :: Lexer
-whitestuffL = 
+whitestuffL =
    (whitecharL <|> commentL <|> ncommentL) %> " "
 \end{code}
 
@@ -213,7 +213,7 @@ whitestuffL =
 
 \begin{code}
 whitecharL :: Lexer
-whitecharL = 
+whitecharL =
        newlineL <|> vertabL <|> formfeedL <|> spaceL
    <|> tabL <|> nonbrkspcL
 \end{code}
@@ -245,7 +245,7 @@ commentL = tokenL "--" <* many any1L <* newlineL
 \begin{code}
 ncommentL :: Lexer
 ncommentL =
-   tokenL "{-" <* aNYseqL 
+   tokenL "{-" <* aNYseqL
    <* soft (many (ncommentL <* aNYseqL)) <* tokenL "{-"
 \end{code}
 
@@ -253,7 +253,7 @@ ncommentL =
 
 \begin{code}
 aNYseqL :: Lexer
-aNYseqL = 
+aNYseqL =
    soft (manyUntil any2L (tokenL "{-" <|> tokenL "-}"))
 \end{code}
 
@@ -276,7 +276,7 @@ any1L = graphicL <|> spaceL <|> tabL <|> nonbrkspcL
 \begin{code}
 graphicL :: Lexer
 graphicL =
-      largeL <|> smallL <|> digitL <|> symbolL <|> specialL 
+      largeL <|> smallL <|> digitL <|> symbolL <|> specialL
    <|> literalL ':' <|> literalL '"' <|> literalL '\''
 \end{code}
 
@@ -384,8 +384,8 @@ varidL' = (
 
 \begin{code}
 varidL :: Lexer
-varidL = 
-   dataSatisfies varidL' 
+varidL =
+   dataSatisfies varidL'
    (\(((_,ident),_):_) -> not (ident `elem` reservedids))
 \end{code}
 
@@ -393,7 +393,7 @@ varidL =
 
 \begin{code}
 conidL :: Lexer
-conidL = ( 
+conidL = (
       largeL <**>
       ((many (smallL <|> largeL <|> digitL <|> literalL '\''
               <|> literalL '_')) *%> "")
@@ -417,7 +417,7 @@ reservedids = [
 \begin{code}
 reservedidL :: Lexer
 reservedidL = (
-      dataSatisfies varidL' 
+      dataSatisfies varidL'
       (\(((_,id),_):_) -> id `elem` reservedids)
    ) %> "reservedid"
 \end{code}
@@ -440,8 +440,8 @@ varsymL' = ( symbolL <**>
 
 \begin{code}
 varsymL :: Lexer
-varsymL = 
-   dataSatisfies varsymL' 
+varsymL =
+   dataSatisfies varsymL'
    (\(((_,sym),_):_) -> not (sym `elem` reservedops))
 \end{code}
 
@@ -475,7 +475,7 @@ reservedopL = (
           tokenL ".."  <|> tokenL "::" <|> tokenL "=>"
       <|> tokenL "="  <|> tokenL "\\" <|> tokenL "|"
       <|> tokenL "<-" <|> tokenL "->" <|> tokenL "@"
-      <|> tokenL "~" 
+      <|> tokenL "~"
    ) %> "reservedop"
 \end{code}
 
@@ -517,7 +517,7 @@ integerL = (
       <|> (literalL '0' <**> literalL 'O' <**> octalL)
       <|> (literalL '0' <**> literalL 'x' <**>
            hexadecimalL)
-      <|> (literalL '0' <**> literalL 'X' <**> 
+      <|> (literalL '0' <**> literalL 'X' <**>
            hexadecimalL)
    ) %> "integer"
 \end{code}
@@ -611,7 +611,7 @@ asciiL = (
       <|> tokenL "NUL" <|> tokenL "SOH" <|> tokenL "STX"
       <|> tokenL "ETX" <|> tokenL "EOT" <|> tokenL "ENQ"
       <|> tokenL "ACK" <|> tokenL "BEL" <|> tokenL "BST"
-      <|> tokenL "LF"  <|> tokenL "VT"  <|> tokenL "FF" 
+      <|> tokenL "LF"  <|> tokenL "VT"  <|> tokenL "FF"
       <|> tokenL "CR"  <|> tokenL "SO"  <|> tokenL "SI"
       <|> tokenL "DLE" <|> tokenL "DC1" <|> tokenL "DC2"
       <|> tokenL "DC3" <|> tokenL "DC4" <|> tokenL "NAK"
@@ -665,7 +665,7 @@ offside [x]
 offside ((("reservedid", "module"),pos):tlps)
    = os [] ((("reservedid", "module"),pos):tlps)
 offside (((tag, lexeme),(line,column)):tlps)
-   =   (("special","{"),(line,column)) 
+   =   (("special","{"),(line,column))
      : ((tag, lexeme),(line,column))
      : os [column] tlps
 \end{code}
@@ -688,7 +688,7 @@ os [] (((t, le),(li,c)):((t', le'),(li',c')):tlps)
         : (("special","{"),(li',c'))
         : os [c'] (((t', le'),(li',c'+1)):tlps)
    | otherwise
-      =   ((t, le),(li,c)) 
+      =   ((t, le),(li,c))
         : os [] (((t', le'),(li',c')):tlps)
 os (col:cols) [((t, le),(li,c))]
    | c < col
@@ -746,13 +746,13 @@ unlex
         = "\n"
      ul indent (((t,le),(li,c)):tlps)
         | t == "special" && le == "{"
-           = "{\n" ++ take (indent+3) (repeat ' ') 
+           = "{\n" ++ take (indent+3) (repeat ' ')
 	     ++ ul (indent+3) tlps
         | t == "special" && le == ";"
-           = "\n" ++  take (indent) (repeat ' ') ++ "; " 
+           = "\n" ++  take (indent) (repeat ' ') ++ "; "
 	     ++ ul indent tlps
         | t == "special" && le == "}"
-           = "\n" ++ take (indent-3) (repeat ' ') ++ "}\n" 
+           = "\n" ++ take (indent-3) (repeat ' ') ++ "}\n"
              ++ ul (indent-3) tlps
         | otherwise
             = le ++ " " ++ ul indent tlps
@@ -862,7 +862,7 @@ there is none.
 
 \begin{code}
 moduleName :: TLPs -> TLPs
-moduleName 
+moduleName
    ((("reservedid","module"),_):(("conid",name),pos):_)
    = [(("module",name),pos)]
 moduleName _
@@ -891,7 +891,7 @@ declarations
      d (tlp:tlps) _ []
         = [reverse (tlp:tlps)]
      d (tlp:tlps) n ((("special","}"),pos):tlps')
-        | n == 0     
+        | n == 0
 	   = [reverse ((("special","}"),pos):tlp:tlps)]
         | otherwise
 	   = d ((("special","}"),pos) : tlp : tlps)
@@ -900,8 +900,8 @@ declarations
         = d ((("special","{"),pos) : tlp : tlps)
 	    (n+1) tlps'
      d (tlp:tlps) n ((("special",";"),pos):tlps')
-        | n == 0    
-	   = reverse ((("special",";"),pos):tlp:tlps) 
+        | n == 0
+	   = reverse ((("special",";"),pos):tlp:tlps)
 	    : d [] 0 tlps'
         | otherwise
 	   = d ((("special",";"),pos):tlp:tlps) n tlps'
@@ -915,7 +915,7 @@ top-level declaration $\mathit{tlps}$ and returns the type
 of declaration (as a new set of {\tt Tag}s), the
 names of the declared objects ({\tt Lexeme}s) and
 the positions of the names of the objects ({\tt
-Pos}s). 
+Pos}s).
 
 \begin{code}
 declared :: TLPs -> TLPs
@@ -937,7 +937,7 @@ declared ((("reservedid","class"),_):tlps)
    = classD tlps
 declared ((("reservedid","instance"),_):tlps)
    = instanceD tlps
-declared tlps 
+declared tlps
    = declD tlps
 \end{code}
 
@@ -950,19 +950,19 @@ importD _ = []
 
 \begin{code}
 fixityD :: TLPs -> TLPs
-fixityD ((("integer",_),_):tlps) 
+fixityD ((("integer",_),_):tlps)
    = fixityD tlps
 fixityD ((("special",_),_):tlps)
    = fixityD tlps
-fixityD ((("consym",name),pos):tlps) 
+fixityD ((("consym",name),pos):tlps)
    = (("fixity",name),pos) : fixityD tlps
-fixityD ((("conid",name),pos):tlps) 
+fixityD ((("conid",name),pos):tlps)
    = (("fixity",name),pos) : fixityD tlps
-fixityD ((("varid",name),pos):tlps) 
+fixityD ((("varid",name),pos):tlps)
    = (("fixity",name),pos) : fixityD tlps
-fixityD ((("varsym",name),pos):tlps) 
+fixityD ((("varsym",name),pos):tlps)
    = (("fixity",name),pos) : fixityD tlps
-fixityD _ 
+fixityD _
    = []
 \end{code}
 
@@ -979,9 +979,9 @@ dataD tlps
         []          -> dataD' tlps
         (tlp:tlps') -> dataD' (tlp:tlps')
      where
-     dataD' ((("conid",name),pos):_) 
+     dataD' ((("conid",name),pos):_)
         = [(("data",name),pos)]
-     dataD' _ 
+     dataD' _
         = []
 \end{code}
 
@@ -994,7 +994,7 @@ newtypeD tlps
      where
      newtypeD' ((("conid",name),pos):_)
         = [(("newtype",name),pos)]
-     newtypeD' _ 
+     newtypeD' _
         = []
 \end{code}
 
@@ -1005,9 +1005,9 @@ classD tlps
         []          -> classD' tlps
         (tlp:tlps') -> classD' (tlp:tlps')
      where
-     classD' ((("conid",name),pos):_) 
+     classD' ((("conid",name),pos):_)
         = [(("class",name),pos)]
-     classD' _ 
+     classD' _
         = []
 \end{code}
 
@@ -1018,9 +1018,9 @@ instanceD tlps
         []          -> instanceD' tlps
         (tlp:tlps') -> instanceD' (tlp:tlps')
      where
-     instanceD' 
+     instanceD'
         ((("conid",name),pos):tlps)
-        = [(("instance",name ++ " " 
+        = [(("instance",name ++ " "
 	   ++ instanceName tlps),pos)]
      instanceD' _
         = error "instance case undefined"
@@ -1070,7 +1070,6 @@ typedeclD _ = []
 
 \begin{code}
 valdeclD :: TLPs -> TLPs
-valdeclD (((_,_),pos):tlps) 
+valdeclD (((_,_),pos):tlps)
    = [(("equation",""),pos)]
 \end{code}
-

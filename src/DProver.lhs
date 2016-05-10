@@ -8,12 +8,12 @@ module Main (main) where
 \end{code}
 
 \begin{code}
-import System; import CPUTime; import Char
-import List; import IO
+import System.Environment; import System.CPUTime; import Data.Char
+import Data.List; import System.IO; import Control.Exception; import System.IO.Error
 \end{code}
 
 \begin{code}
-import ABR.Parser; import ABR.Args; import ABR.List 
+import ABR.Parser; import ABR.Args; import ABR.List
 import ABR.Text.String; import ABR.Control.Check
 import ABR.Data.BSTree; import ABR.Parser.Checks
 \end{code}
@@ -26,7 +26,7 @@ import DRunFile
 
 \begin{code}
 main :: IO ()
-main = do 
+main = do
    args <- getArgs
    run $ unwords args
 \end{code}
@@ -50,7 +50,7 @@ getPath options = do
    hFlush stdout
    path <- getLine
    let path' = trim path
-   case path' of 
+   case path' of
       []  -> getPath options
       "q" -> quit
       _:_ -> openTheory options path' Nothing
@@ -59,7 +59,7 @@ getPath options = do
 \begin{code}
 openTheory :: Options -> FilePath -> Maybe String -> IO ()
 openTheory options path mtl = do
-   source <- catch (readFile path) (\e -> return "\0")
+   source <- catch (readFile path) (\ (NoMethodError e) -> return "\0")
    case source of
       "\0" -> do
          putStrLn $ "Error: File " ++ path ++ " is \
@@ -73,8 +73,8 @@ openTheory options path mtl = do
                Nothing -> getPath options
                _       -> quit
          CheckPass t   -> do
-            case (lookupBST "t" options, 
-	          lookupBST "tp" options, 
+            case (lookupBST "t" options,
+	          lookupBST "tp" options,
 	          lookupBST "td" options,
 	          lookupBST "r" options) of
 	       (Just FlagMinus,_,_,_) ->
@@ -88,7 +88,7 @@ openTheory options path mtl = do
 	       _ -> case mtl of
                   Nothing    ->
 	             interactive t options
-                  Just l -> do 
+                  Just l -> do
 	             proveOne t options l emptyHistory
 	                 emptyHistory
 	             return ()
@@ -101,29 +101,29 @@ interactive t options = do
       proofLoop options emptyHistory emptyHistory
    where
    proofLoop :: Options -> Hist -> WFHist -> IO ()
-   proofLoop options h wh = do 
+   proofLoop options h wh = do
       putStr "|- "
       hFlush stdout
       input <- getLine
       let input' = words input
       case input' of
-         [] -> 
+         [] ->
 	    proofLoop options h wh
-         "?" : _ -> do 
+         "?" : _ -> do
 	    showHelp
 	    proofLoop options h wh
          "q" : _ ->
 	    quit
-         "t" : _ -> do 
+         "t" : _ -> do
 	    putStrLn $ show t
             proofLoop options h wh
-         "tp": _ -> do 
+         "tp": _ -> do
 	    putStrLn $ show $ PrologTheory t
             proofLoop options h wh
-         "td" : _ -> do 
+         "td" : _ -> do
 	    putStrLn $ show $ DeloresTheory t
             proofLoop options h wh
-         "f" : _ -> do 
+         "f" : _ -> do
 	    putStrLn "Those who forget history \
 	             \are destined to repeat it."
             proofLoop options emptyHistory emptyHistory
@@ -137,21 +137,21 @@ interactive t options = do
 	          putStr "Current prover: "
 	          case lookupBST "e" options of
 	             Nothing ->
-	                putStrLn $ "nhlt" 
+	                putStrLn $ "nhlt"
 	             Just (ParamValue p) ->
 	                putStrLn p
 	          proofLoop options h wh
 	       else do
-	          putStrLn $ "Error: No such prover: " 
+	          putStrLn $ "Error: No such prover: "
 	                     ++ cs
 	          proofLoop options h wh
-         "r" : rFile : _ -> do 
+         "r" : rFile : _ -> do
             doRunFile t options rFile
             proofLoop options h wh
 	 "l" : [] ->
-	    getPath options 
+	    getPath options
 	 "l" : p: [] ->
-	    openTheory options p Nothing  
+	    openTheory options p Nothing
          _ -> do
 	    (h',wh') <- proveOne t options input h wh
             proofLoop options h' wh'
@@ -175,14 +175,14 @@ showHelp = putStrLn
    \   l [path]   = read a new theory file\
                     \ [named path].\n"
 \end{code}
-   
+
 \begin{code}
 proveOne :: Theory -> Options -> String  -> Hist -> WFHist
    -> IO (Hist,WFHist)
 proveOne t options input h wh
    = case (checkParse lexerL (total taggedLiteralP)
            &? checkNoVars) input of
-        CheckFail msg -> do 
+        CheckFail msg -> do
 	   putStrLn msg
 	   return (h,wh)
         CheckPass tl -> do
@@ -198,8 +198,8 @@ quit = putStrLn "Goodbye."
 \begin{code}
 doRunFile :: Theory -> Options -> FilePath -> IO ()
 doRunFile t@(Theory fs rs ps) options rFile = do
-   source <- catch (readFile rFile) (\e -> return "\0")
-   case source of 
+   source <- catch (readFile rFile) (\(NoMethodError e) -> return "\0")
+   case source of
       "\0" -> putStrLn $ "Can't read file: " ++ rFile
       _    -> case checkParse lexerL runFileP source of
          CheckFail msg     -> do
@@ -210,27 +210,27 @@ doRunFile t@(Theory fs rs ps) options rFile = do
                 run1 :: Run -> Tagged Literal -> IO String
                 run1 fs' tl = do
                    (_,_,r) <- prove (Theory (fs' ++ fs)
-                      rs ps) options "nhlt" tl 
+                      rs ps) options "nhlt" tl
                       emptyHistory emptyHistory
                    case r of
-                      "Proved"     -> return "P" 
-                      "Not proved" -> return "N" 
+                      "Proved"     -> return "P"
+                      "Not proved" -> return "N"
                       "Loops"      -> return "L"
                 runRun :: Run -> IO [String]
                 runRun run = mapM (run1 run) tls
             rss <- mapM runRun runs
             putStrLn "\nSummary table:"
-            let table = if null runs 
+            let table = if null runs
                    then [["No runs."]]
                    else (map (const "") (head runs) ++
                         map show tls) :
-                        zipWith (\run rs -> 
+                        zipWith (\run rs ->
                            map show run ++ rs) runs rss
                 widths = map ((+2) . maximum) $
                    (map . map) length $
                    transpose table
                 spaceOut :: [Int] -> [String] -> String
-                spaceOut ws css = concat $ 
+                spaceOut ws css = concat $
                    zipWith (\w cs -> rJustify w cs) ws css
                 table' = map (spaceOut widths) table
             putStr $ unlines $ table'

@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -45,7 +45,7 @@ import Data.Char
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Sorting} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -60,12 +60,12 @@ msort lt xs  = let (ys,zs) = split xs
                in merge lt (msort lt ys) (msort lt zs)
 \end{code}
 
-\noindent \highlighttt{sortByLength}~$\mathit{xss}$ sorts a 
+\noindent \highlighttt{sortByLength}~$\mathit{xss}$ sorts a
 list of lists into non-descending order of length.
 
 \begin{code}
 sortByLength :: [[a]] -> [[a]]
-sortByLength = 
+sortByLength =
    sortBy (\xs ys -> compare (length xs) (length ys))
 \end{code}
 
@@ -79,7 +79,7 @@ $\mathit{ys}$ using $\mathit{lt}$ to decide what is less that what.
 merge :: (a -> a -> Bool) -> [a] -> [a] -> [a]
 merge _ [] ys = ys
 merge _ xs [] = xs
-merge lt (x:xs) (y:ys) 
+merge lt (x:xs) (y:ys)
    | x `lt` y  = x : merge lt xs (y:ys)
    | otherwise = y : merge lt (x:xs) ys
 \end{code}
@@ -98,7 +98,7 @@ split xs = case xs of
 \end{code}
 
 
-\noindent \highlighttt{cartProd} produces the cartesian 
+\noindent \highlighttt{cartProd} produces the cartesian
 product of an arbitrary number of lists. That is,
 {\tt cartProd~[}$\mathit{xs}_{1}, \, \mathit{xs}_{2}, \, \ldots${\tt]}
 returns $\mathit{xs}_{1} \times \mathit{xs}_{2} \times \ldots$
@@ -121,7 +121,7 @@ interleave x ys = case ys of
    y:ys -> (x:y:ys) : map (y:) (interleave x ys)
 \end{code}
 
-\noindent \highlighttt{separate}~$\mathit{xs}~\mathit{yss}$ 
+\noindent \highlighttt{separate}~$\mathit{xs}~\mathit{yss}$
 concats $\mathit{yss}$, with $\mathit{xs}$ interspersed.
 
 \begin{code}
@@ -248,7 +248,7 @@ order that monotonically increases in length.
 properSublists :: [a] -> [[a]]
 properSublists xs = case xs of
    [] -> []
-   _  -> [] : concat [combinations k xs 
+   _  -> [] : concat [combinations k xs
                      | k <- [1..length xs - 1]]
 \end{code}
 
@@ -273,7 +273,7 @@ subBag (x:xs) ys  = case del x ys of
                          (_, ys')   -> (True, y : ys')
 \end{code}
 
-\noindent \highlighttt{bagElem}~$\mathit{xs}~\mathit{xss}$ returns {\tt True} iff $\mathit{xs}$ or 
+\noindent \highlighttt{bagElem}~$\mathit{xs}~\mathit{xss}$ returns {\tt True} iff $\mathit{xs}$ or
 some permutation of $\mathit{xs}$ is an element of $\mathit{xss}$.
 
 \begin{code}
@@ -310,7 +310,7 @@ duplicates (x:xs)
 \end{code}
 
 \noindent \highlighttt{snub}~$\mathit{xs}$ returns the unique elements of $\mathit{xs}$ in
-non-descending order, and does it in $O(N \log N)$ time. 
+non-descending order, and does it in $O(N \log N)$ time.
 
 \begin{code}
 snub :: Ord a => [a] -> [a]
@@ -322,11 +322,11 @@ snub xs
      (ys, zs) = split xs
 \end{code}
 
-\noindent $X$~\highlighttt{+:}~$x$ returns $X \cup \{x\}$. 
+\noindent $X$~\highlighttt{+:}~$x$ returns $X \cup \{x\}$.
 
 \begin{code}
 infixl 5 +:
-(+:) :: Ord a => [a] -> a -> [a] 
+(+:) :: Ord a => [a] -> a -> [a]
 xs +: x = snub (x : xs)
 \end{code}
 
@@ -426,7 +426,7 @@ strictly ascending order.
 \begin{code}
 findSubset :: Ord a => [a] -> [a] -> Maybe [a]
 findSubset lefts rights = fss lefts rights
-   where 
+   where
    fss  []     []                 = Just lefts
    fss  []     _                  = Just lefts
    fss  _      []                 = Just rights
@@ -453,7 +453,7 @@ all elements of $\mathit{xss}$ are unique.
 
 \begin{code}
 noSuperSets :: Ord a => [[a]] -> [[a]]
-noSuperSets xss = [xs | xs <- xss, 
+noSuperSets xss = [xs | xs <- xss,
    not (any (`isProperSubset` xs) xss)]
 \end{code}
 
@@ -507,7 +507,7 @@ notSubSequence :: Eq a => [a] -> [a] -> Bool
 notSubSequence p w = not $ isSubSequence p w
 \end{code}
 
-\noindent \highlighttt{chop}~$x~\mathit{xs}$ returns the 
+\noindent \highlighttt{chop}~$x~\mathit{xs}$ returns the
 sublists in $\mathit{xs}$ that are separated by elements
 equal to $x$.
 
@@ -521,7 +521,7 @@ chop x xs = case xs of
             _ : xs -> chop x xs
 \end{code}
 
-\noindent \highlighttt{chops}~$\mathit{bs}~\mathit{xs}$ returns the 
+\noindent \highlighttt{chops}~$\mathit{bs}~\mathit{xs}$ returns the
 sublists in $\mathit{xs}$ that are separated by sequences
 equal to $\mathit{bs}$.
 
@@ -535,14 +535,14 @@ chops bs xs
    chp xs
       | null xs            = []
       | bs `isPrefixOf` xs = chp (drop n xs)
-      | otherwise          = 
+      | otherwise          =
          let (ys,zs) = brk xs
          in ys : chp zs
    brk xs
       | bs `isPrefixOf` xs = ([], drop n xs)
       | otherwise          = case xs of
          [] -> ([],[])
-         x : xs -> 
+         x : xs ->
             let (ys,zs) = brk xs
             in (x : ys, zs)
 \end{code}
@@ -565,4 +565,3 @@ subsSuffix sep suf xs =
              reverse suf ++ zs
    in reverse rs'
 \end{code}
-

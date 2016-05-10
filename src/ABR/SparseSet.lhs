@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -40,7 +40,7 @@ import ABR.Data.BSTree
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Data type}
 
@@ -48,7 +48,7 @@ A \highlighttt{SparseSet} is a implemented with a
 height-balanced tree.
 
 \begin{code}
-type SparseSet a = 
+type SparseSet a =
    BSTree a ()
 \end{code}
 
@@ -92,7 +92,7 @@ mkSS e = insertSS e emptySS
 deleteSS :: Ord k =>  SparseSet k -> k -> SparseSet k
 deleteSS = flip deleteBST
 \end{code}
-   
+
 \noindent \highlighttt{elemSS}~$s$ returns {\tt
 True} iff $e \in s$.
 
@@ -159,11 +159,10 @@ sectSS a b = list2SS $ filter (`elemSS` b) $ flattenSS a
 \end{code}
 
 \noindent \highlighttt{diffSS}~$a~b$ returns $a
-- b$. 
+- b$.
 
 \begin{code}
 diffSS :: Ord k => SparseSet k -> SparseSet k
                    -> SparseSet k
 diffSS a b = foldl deleteSS a $ flattenSS b
 \end{code}
-

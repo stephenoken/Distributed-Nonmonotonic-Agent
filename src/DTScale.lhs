@@ -8,7 +8,7 @@ module Main (main) where
 \end{code}
 
 \begin{code}
-import System; import CPUTime
+import System.Environment; import System.CPUTime
 \end{code}
 
 \begin{code}
@@ -36,7 +36,7 @@ run = run' . words
 
 \begin{code}
 run' :: [String] -> IO ()
-run' args = 
+run' args =
    let (options,thName:sizes) = findOpts [ParamS "e",
           FlagS "t", FlagS "tp", FlagS "td", FlagS "o",
 	  FlagS "m"]
@@ -62,7 +62,7 @@ run' args =
 	 _ -> do
 	    case lookupBST "m" options of
 	       Just FlagMinus -> do
-	          let Just (f,r,p,s) = 
+	          let Just (f,r,p,s) =
 	                 generateMetrics thName sizes'
 		  putStrLn $
 		     "Computed metrics:"
@@ -82,7 +82,7 @@ run' args =
             putStrLn $ "# priorities: " ++ show nps
             putStrLn $ "# literals in all bodies: "
                        ++ show nls
-	    putStrLn $ "### total size = " 
+	    putStrLn $ "### total size = "
 	               ++ show (nfs + nrs + nps + nls)
 		       ++ "\n"
 	    case lookupBST "o" options of

@@ -40,37 +40,37 @@ The syntax for a priority declaration is:
 
 \begin{code}
 priorityP :: Parser Priority
-priorityP = labelP <*> literalP "symbol" ">"
-            *> nofail' "label expected" labelP
+priorityP = labelP ABR.Parser.<*> literalP "symbol" ">"
+            ABR.Parser.*> nofail' "label expected" labelP
             @> uncurry (:>)
 \end{code}
 
 
 \submodule{Testing for cycles} %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In the Defeasible and Plausible logics, cycles in 
+In the Defeasible and Plausible logics, cycles in
 the priority relation are not permitted. The following
 is sufficient to detect cycles, but can not identify
 only those priorities that contribute directly to
-cycles. 
+cycles.
 
 \begin{figure}[htbp]
    \centering
    \epsfig{figure=\figs PriorityGraphFig.pdf}
    \caption{\setMyFontSize\label{priorityGraphFig}
-            A priority relation represented as 
+            A priority relation represented as
             directed graphs, before and after cycle
 	    detection.}
 \end{figure}
 
 The algorithm is to count the number of times each label
-is superior and inferior. Then delete any priority 
+is superior and inferior. Then delete any priority
 where the label at either end has either count equal
-to zero. Repeat until no progress is made. Then all 
+to zero. Repeat until no progress is made. Then all
 remaining priorities are either involved in a cycle
-or involved in a connection between two cycles. For 
+or involved in a connection between two cycles. For
 example, figure~\ref{priorityGraphFig} shows a priority
-relation before and after the application of 
+relation before and after the application of
 {\tt cycles} as directed graphs. The nodes are labels.
 The edges are priorities. The unfilled node is not
 involved in any cycle but is not removed.
@@ -83,10 +83,10 @@ type LRCounts = BSTree Label (LCount,RCount)
 countPriorities :: [Priority] -> LRCounts
 countPriorities
    = let count1L :: Label -> LRCounts -> LRCounts
-         count1L l 
+         count1L l
             = updateBST (\ _ (l,r) -> (l + 1, r)) l (1,0)
          count1R :: Label -> LRCounts -> LRCounts
-         count1R l 
+         count1R l
             = updateBST (\ _ (l,r) -> (l, r + 1)) l (0,1)
          count1 :: Priority -> LRCounts -> LRCounts
          count1 (lL :> lR) = (count1L lL) . (count1R lR)
@@ -106,7 +106,7 @@ pruneAcyclicLabels ps
 \end{code}
 
 {\tt cycles ps} returns the priorities in that may be
-involved in cycles in {\tt ps}. The empty list is 
+involved in cycles in {\tt ps}. The empty list is
 returned iff there are no cycles in {\tt ps}.
 
 \begin{code}

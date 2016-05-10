@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -51,7 +51,7 @@ module ABR.DeepSeq (DeepSeq(..), ($!!)) where
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Class Definition} %%%%%%%%%%%%%%%%%
 
@@ -85,7 +85,7 @@ f $!! x = x `deepSeq` f x
 \submodule{Instance Declarations} %%%%%%%%%%%%%%%%%
 
 \subsubmodule{Simple instances}
- 
+
 \begin{code}
 instance DeepSeq ()       where {}
 instance DeepSeq Bool     where {}
@@ -98,15 +98,15 @@ instance DeepSeq Double   where {}
 \end{code}
 
 \subsubmodule{Tuple instances}
- 
+
 \begin{code}
-instance (DeepSeq a, DeepSeq b) => 
+instance (DeepSeq a, DeepSeq b) =>
          DeepSeq (a,b) where
    deepSeq (a,b) y = deepSeq a $ deepSeq b y
 \end{code}
 
 \begin{code}
-instance (DeepSeq a, DeepSeq b, DeepSeq c) => 
+instance (DeepSeq a, DeepSeq b, DeepSeq c) =>
       DeepSeq (a,b,c) where
    deepSeq (a,b,c) y = deepSeq a $ deepSeq b $ deepSeq c y
 \end{code}
@@ -119,22 +119,22 @@ instance (DeepSeq a,DeepSeq b,DeepSeq c,DeepSeq d) =>
 \end{code}
 
 \begin{code}
-instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d, 
+instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d,
       DeepSeq e) => DeepSeq (a,b,c,d,e) where
    deepSeq (a,b,c,d,e) y = deepSeq a $ deepSeq b $
       deepSeq c $ deepSeq d $ deepSeq e y
 \end{code}
 
 \begin{code}
-instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d, 
+instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d,
       DeepSeq e, DeepSeq f) => DeepSeq (a,b,c,d,e,f) where
-   deepSeq (a,b,c,d,e,f) y = deepSeq a $ deepSeq b $ 
+   deepSeq (a,b,c,d,e,f) y = deepSeq a $ deepSeq b $
       deepSeq c $ deepSeq d $ deepSeq e $ deepSeq f y
 \end{code}
 
 \begin{code}
-instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d, 
-      DeepSeq e,DeepSeq f,DeepSeq g) => 
+instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d,
+      DeepSeq e,DeepSeq f,DeepSeq g) =>
       DeepSeq (a,b,c,d,e,f,g) where
    deepSeq (a,b,c,d,e,f,g) y = deepSeq a $ deepSeq b $
       deepSeq c $ deepSeq d $ deepSeq e $ deepSeq f $
@@ -142,7 +142,7 @@ instance (DeepSeq a, DeepSeq b, DeepSeq c, DeepSeq d,
 \end{code}
 
 \subsubmodule{List instance}
- 
+
 \begin{code}
 instance (DeepSeq a) => DeepSeq [a] where
    deepSeq [] y = y
@@ -150,7 +150,7 @@ instance (DeepSeq a) => DeepSeq [a] where
 \end{code}
 
 \subsubmodule{Maybe instance}
- 
+
 \begin{code}
 instance (DeepSeq a) => DeepSeq (Maybe a) where
    deepSeq Nothing y = y
@@ -158,12 +158,10 @@ instance (DeepSeq a) => DeepSeq (Maybe a) where
 \end{code}
 
 \subsubmodule{Either instance}
- 
+
 \begin{code}
-instance (DeepSeq a, DeepSeq b) => 
+instance (DeepSeq a, DeepSeq b) =>
       DeepSeq (Either a b) where
    deepSeq (Left a) y = deepSeq a y
    deepSeq (Right b) y = deepSeq b y
 \end{code}
-
-

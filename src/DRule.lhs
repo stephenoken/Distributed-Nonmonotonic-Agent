@@ -4,8 +4,8 @@ Module {\tt DRule} implements a data type for
 representing rules in Defeasible logic theories.
 
 \begin{code}
-{-# LANGUAGE MultiParamTypeClasses, 
-             TypeSynonymInstances #-}
+{-# LANGUAGE MultiParamTypeClasses,
+             TypeSynonymInstances, FlexibleInstances #-}
 \end{code}
 
 \begin{code}
@@ -66,16 +66,16 @@ The syntax for a rule is:
 
 \begin{code}
 antecedentP :: Parser [Literal]
-antecedentP 
-   =     literalP "symbol" "{" <*> literalP "symbol" "}"
+antecedentP
+   =     literalP "symbol" "{" ABR.Parser.<*> literalP "symbol" "}"
          #> []
      <|> literalP "symbol" "{"
-         *> (pLiteralP <*>
-	     many (literalP "symbol" "," *> pLiteralP))
-         <* nofail (literalP "symbol" "}")
+         ABR.Parser.*> (pLiteralP ABR.Parser.<*>
+	     many (literalP "symbol" "," ABR.Parser.*> pLiteralP))
+         ABR.Parser.<* nofail (literalP "symbol" "}")
          @> cons
-     <|> pLiteralP <*>
-         many (literalP "symbol" "," *> pLiteralP)
+     <|> pLiteralP ABR.Parser.<*>
+         many (literalP "symbol" "," ABR.Parser.*> pLiteralP)
          @> cons
      <|> epsilonA
          #> []
@@ -84,9 +84,9 @@ antecedentP
 \begin{code}
 ruleP :: Parser Rule
 ruleP = antecedentP
-        <*> (    literalP "symbol" "->"
+        ABR.Parser.<*> (    literalP "symbol" "->"
 	     <|> literalP "symbol" "=>"
-	     <|> literalP "symbol" "~>") <*> pLiteralP
+	     <|> literalP "symbol" "~>") ABR.Parser.<*> pLiteralP
 	@> (\(as,((_,arrow,_),c)) -> (case arrow of
 	         "->" -> (:->)
 	         "=>" -> (:=>)
@@ -102,12 +102,12 @@ The alternate \dprolog-compatible syntax for a rule is:
 
 \begin{code}
 prologAntecedentP :: Parser [Literal]
-prologAntecedentP 
+prologAntecedentP
    =     literalP "name1" "true"
          #> []
      <|> prologLiteralP
-         <*> many (literalP "symbol" ","
-	           *> nofail' "literal expected"
+         ABR.Parser.<*> many (literalP "symbol" ","
+	           ABR.Parser.*> nofail' "literal expected"
 		              prologLiteralP)
          @> cons
 \end{code}
@@ -116,10 +116,10 @@ prologAntecedentP
 prologRuleP :: Parser Rule
 prologRuleP
    = prologLiteralP
-     <*> (    literalP "symbol" ":-"
+     ABR.Parser.<*> (    literalP "symbol" ":-"
 	  <|> literalP "symbol" ":="
 	  <|> literalP "symbol" ":^")
-     <*> prologAntecedentP
+     ABR.Parser.<*> prologAntecedentP
      @> (\(c,((_,arrow,_),as)) -> (case arrow of
              ":-" -> (:->)
 	     ":=" -> (:=>)
@@ -131,10 +131,10 @@ prologRuleP
 \submodule{Properties of rules} %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The {\tt IsRule} class collects the properties of
-rules and rule-like types. {\tt is{\it X} r} returns 
-{\tt True} iff {\tt r} is an {\tt\it X}. 
+rules and rule-like types. {\tt is{\it X} r} returns
+{\tt True} iff {\tt r} is an {\tt\it X}.
 {\tt antecedent r} returns the list of literals
-which are the antecedents of rule {\tt r}. 
+which are the antecedents of rule {\tt r}.
 {\tt consequent r} returns the literal which is the
 consequent of {\tt r}. This is a multi-parameter
 type class, which relies on Haskell extensions.
@@ -211,7 +211,7 @@ instance Show Rule where
 \end{code}
 
 \begin{code}
-   showsPrec p rule = case rule of 
+   showsPrec p rule = case rule of
          (a :-> c) -> showsAntecedent a . showString " -> "
                       . shows c
          (a :=> c) -> showsAntecedent a . showString " => "
@@ -227,15 +227,15 @@ instance Show PrologRule where
 \end{code}
 
 \begin{code}
-   showsPrec p (PrologRule rule) = case rule of 
+   showsPrec p (PrologRule rule) = case rule of
          (a :-> c) -> shows (PrologLiteral c)
-                      . showString " :- " 
+                      . showString " :- "
 		      . showsAntecedent a
          (a :=> c) -> shows (PrologLiteral c)
                       . showString " := "
 		      . showsAntecedent a
-         (a :~> c) -> shows (PrologLiteral c) 
-                      . showString " :^ " 
+         (a :~> c) -> shows (PrologLiteral c)
+                      . showString " :^ "
 		      . showsAntecedent a
       where
       showsAntecedent as = case as of
@@ -243,7 +243,7 @@ instance Show PrologRule where
          _  -> showWithSep ", " $ map PrologLiteral as
 \end{code}
 
-Introducing type {\tt Rule} to class {\tt HasLits} enables 
+Introducing type {\tt Rule} to class {\tt HasLits} enables
 the extraction of all the unique literals in a rule.
 
 \begin{code}
@@ -251,7 +251,7 @@ instance HasLits Rule where
 \end{code}
 
 \begin{code}
-   getLits r t = case r of 
+   getLits r t = case r of
       (a :-> c) -> foldr getLits (getLits c t) a
       (a :=> c) -> foldr getLits (getLits c t) a
       (a :~> c) -> foldr getLits (getLits c t) a
@@ -264,7 +264,7 @@ instance HasConstNames Rule where
 \end{code}
 
 \begin{code}
-   getConstNames r t = case r of 
+   getConstNames r t = case r of
       (a :-> c) ->
          foldr getConstNames (getConstNames c t) a
       (a :=> c) ->
@@ -280,7 +280,7 @@ instance HasVarNames Rule where
 \end{code}
 
 \begin{code}
-   getVarNames r t = case r of 
+   getVarNames r t = case r of
       (a :-> c) -> foldr getVarNames (getVarNames c t) a
       (a :=> c) -> foldr getVarNames (getVarNames c t) a
       (a :~> c) -> foldr getVarNames (getVarNames c t) a
@@ -293,8 +293,8 @@ instance Groundable Rule where
 \end{code}
 
 \begin{code}
-   ground v c r = case r of 
-      qs :-> q -> map (ground v c) qs :-> ground v c q 
-      qs :=> q -> map (ground v c) qs :=> ground v c q 
-      qs :~> q -> map (ground v c) qs :~> ground v c q 
+   ground v c r = case r of
+      qs :-> q -> map (ground v c) qs :-> ground v c q
+      qs :=> q -> map (ground v c) qs :=> ground v c q
+      qs :~> q -> map (ground v c) qs :~> ground v c q
 \end{code}

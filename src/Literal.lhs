@@ -94,16 +94,16 @@ argumentP = nofail' "argument expected" (
 \begin{code}
 argListP :: Parser [Argument]
 argListP = literalP "symbol" "("
-           *> argumentP
-	   <*> many (literalP "symbol" "," *> argumentP)
-	   <* nofail (literalP "symbol" ")")
+           ABR.Parser.*> argumentP
+	   ABR.Parser.<*> many (literalP "symbol" "," ABR.Parser.*> argumentP)
+	   ABR.Parser.<* nofail (literalP "symbol" ")")
 	   @> cons
 \end{code}
 
 \begin{code}
 pLiteralP :: Parser Literal
 pLiteralP = optional (literalP "symbol" "~")
-            <*> tagP "name1" <*> optional argListP
+            ABR.Parser.<*> tagP "name1" ABR.Parser.<*> optional argListP
 	    @> (\(ts,((_,n,_),ass)) -> case (ts,ass) of
 	          ([],[])    -> PosLit n
 		  ([_],[])   -> NegLit n
@@ -123,7 +123,7 @@ An alternate syntax for literals, compatible with
 prologLiteralP :: Parser Literal
 prologLiteralP
    = optional (literalP "name1" "neg")
-     <*> tagP "name1" <*> optional argListP
+     ABR.Parser.<*> tagP "name1" ABR.Parser.<*> optional argListP
      @> (\(negs,((_,n,_),ass)) -> case (negs,ass) of
            ([],[])    -> PosLit n
 	   ([_],[])   -> NegLit n

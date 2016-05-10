@@ -9,7 +9,7 @@ module ProofResult(
       ProofResult(..), WFResult(..)
    ) where
 \end{code}
-   
+
 \begin{code}
 import ThreadedTest
 \end{code}
@@ -18,7 +18,7 @@ import ThreadedTest
 
 An attempted proof may at a given point in time, have
 been definitely proved, definitely not proved, known
-to loop, or be still in progress. 
+to loop, or be still in progress.
 
 \begin{code}
 data ProofResult =
@@ -43,16 +43,16 @@ instance Show ProofResult where
    showsPrec p NotAttempted = showString "Not Attempted"
 \end{code}
 
-Threading tests. 
+Threading tests.
 
 \begin{code}
 instance ThreadedResult ProofResult where
 \end{code}
-   
+
 \begin{code}
    mkTest b s = return (if b then Yes else No, s)
 \end{code}
-   
+
 \begin{code}
    (&&&) t1 t2 s = do
       (r1,s1) <- t1 s
@@ -63,9 +63,9 @@ instance ThreadedResult ProofResult where
          Pending      -> error "Pending in &&&"
          NotAttempted -> error "NotAttempted in &&&"
 \end{code}
-   
+
 \begin{code}
-   (|||) t1 t2 s = do 
+   (|||) t1 t2 s = do
       (r1,s1) <- t1 s
       case r1 of
          Yes          -> return (r1, s1)
@@ -74,7 +74,7 @@ instance ThreadedResult ProofResult where
          Pending      -> error "Pending in |||"
          NotAttempted -> error "NotAttempted in |||"
 \end{code}
-   
+
 \begin{code}
    fA' ts s  = case ts of
       []         -> return (Yes, s)
@@ -85,10 +85,10 @@ instance ThreadedResult ProofResult where
             Yes          -> fA' (t2:ts) s1
             No           -> return (r1,s1)
             Bottom       -> return (r1,s1)
-            Pending      -> error "Pending in fA'" 
-            NotAttempted -> error "NotAttempted in fA'" 
+            Pending      -> error "Pending in fA'"
+            NotAttempted -> error "NotAttempted in fA'"
 \end{code}
-   
+
 \begin{code}
    tE' ts s = case ts of
       []         -> return (No, s)
@@ -99,8 +99,8 @@ instance ThreadedResult ProofResult where
             Yes          -> return (r1,s1)
             No           -> tE' (t2:ts) s1
             Bottom       -> tE' (t2:ts) s1
-            Pending      -> error "Pending in tE'" 
-            NotAttempted -> error "NotAttempted in tE'" 
+            Pending      -> error "Pending in tE'"
+            NotAttempted -> error "NotAttempted in tE'"
 \end{code}
 
 
@@ -108,7 +108,7 @@ instance ThreadedResult ProofResult where
 
 This variant proof result type allows the implementation
 of well-founded provers. This makes a difference only
-when loop detection is available. The result 
+when loop detection is available. The result
 bottom (loops) is not propagated and gets changed
 to not proved.
 
@@ -134,16 +134,16 @@ instance Show WFResult where
 \begin{code}
 instance ThreadedResult WFResult where
 \end{code}
-   
+
 \begin{code}
    mkTest b s = return (if b then WFYes else WFNo, s)
 \end{code}
-   
+
 \begin{code}
    (&&&) t1 t2 s = do
       (r1,s1) <- t1 s
       case r1 of
-         WFYes     -> do 
+         WFYes     -> do
 	    (r2,s2) <- t2 s1
 	    case r2 of
 	       WFYes     -> return (r2, s2)
@@ -156,9 +156,9 @@ instance ThreadedResult WFResult where
          WFPending -> error "Pending in &&&"
          WFNotAtt  -> error "NotAttempted in &&&"
 \end{code}
-   
+
 \begin{code}
-   (|||) t1 t2 s = do 
+   (|||) t1 t2 s = do
       (r1,s1) <- t1 s
       case r1 of
          WFYes     -> return (r1, s1)
@@ -181,45 +181,45 @@ instance ThreadedResult WFResult where
          WFPending -> error "Pending in |||"
          WFNotAtt  -> error "NotAttempted in |||"
 \end{code}
-   
+
 \begin{code}
    fA' ts s  = case ts of
       []         -> return (WFYes, s)
-      [t]        -> do 
+      [t]        -> do
          (r1,s1) <- t s
 	 case r1 of
             WFYes     -> return (r1,s1)
             WFNo      -> return (r1,s1)
             WFBottom  -> return (WFNo,s1)
-            WFPending -> error "Pending in fA'" 
-            WFNotAtt  -> error "NotAttempted in fA'" 
+            WFPending -> error "Pending in fA'"
+            WFNotAtt  -> error "NotAttempted in fA'"
       (t1:t2:ts) -> do
          (r1,s1) <- t1 s
          case r1 of
             WFYes     -> fA' (t2:ts) s1
             WFNo      -> return (r1,s1)
             WFBottom  -> return (WFNo,s1)
-            WFPending -> error "Pending in fA'" 
-            WFNotAtt  -> error "NotAttempted in fA'" 
+            WFPending -> error "Pending in fA'"
+            WFNotAtt  -> error "NotAttempted in fA'"
 \end{code}
-   
+
 \begin{code}
    tE' ts s = case ts of
       []         -> return (WFNo, s)
-      [t]        -> do 
+      [t]        -> do
          (r1,s1) <- t s
 	 case r1 of
             WFYes     -> return (r1,s1)
             WFNo      -> return (r1,s1)
             WFBottom  -> return (WFNo,s1)
-            WFPending -> error "Pending in tE'" 
-            WFNotAtt  -> error "NotAttempted in tE'" 
+            WFPending -> error "Pending in tE'"
+            WFNotAtt  -> error "NotAttempted in tE'"
       (t1:t2:ts) -> do
          (r1,s1) <- t1 s
          case r1 of
             WFYes     -> return (r1,s1)
             WFNo      -> tE' (t2:ts) s1
             WFBottom  -> tE' (t2:ts) s1
-            WFPending -> error "Pending in tE'" 
-            WFNotAtt  -> error "NotAttempted in tE'" 
+            WFPending -> error "Pending in tE'"
+            WFNotAtt  -> error "NotAttempted in tE'"
 \end{code}

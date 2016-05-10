@@ -1,7 +1,7 @@
 \module{Run-files}
 
 The {\tt DRunFile} module defines a data type for
-representing a generator of test cases with 
+representing a generator of test cases with
 combinations of facts.
 
 \begin{code}
@@ -22,7 +22,7 @@ import DInference
 
 \submodule{Data type definitions} %%%%%%%%%%%%%%%%%%%%%%%%%
 
-An {\tt RInput} is one set of mutually exclusive 
+An {\tt RInput} is one set of mutually exclusive
 literals.
 
 \begin{code}
@@ -39,7 +39,7 @@ type RIgnore = [Literal]
 \noindent An {\tt ROutput} is one tagged literal.
 
 \begin{code}
-type ROutput = Tagged Literal 
+type ROutput = Tagged Literal
 \end{code}
 
 \noindent An {\tt RStatement} represents one statement
@@ -67,7 +67,7 @@ type Run = [Literal]
 
 \submodule{Parser} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The syntax for a runfile is given in 
+The syntax for a runfile is given in
 section~\ref{DProverUser}, and is implemented as follows:
 
 \begin{code}
@@ -76,7 +76,7 @@ runFileP = total $ many (
       (     rInputP  @> RInput
         <|> rIgnoreP @> RIgnore
         <|> rOutputP @> ROutput
-      ) <* literalP "symbol" "."
+      ) ABR.Parser.<* literalP "symbol" "."
    ) @> (foldr (\s (ins,igs,os) -> case s of
             RInput qs  -> (qs : ins, igs,      os     )
             RIgnore qs -> (ins,      qs : igs, os     )
@@ -86,39 +86,39 @@ runFileP = total $ many (
 
 \begin{code}
 rInputP :: Parser RInput
-rInputP = 
-      literalP "name1" "input" 
-    *> (     literalP "symbol" "{"
-          *> pLiteralP 
-         <*> many (
+rInputP =
+      literalP "name1" "input"
+    ABR.Parser.*> (     literalP "symbol" "{"
+          ABR.Parser.*> pLiteralP
+         ABR.Parser.<*> many (
                   literalP "symbol" ","
-               *> pLiteralP
+               ABR.Parser.*> pLiteralP
              )
-         <*  literalP "symbol" "}" 
+         ABR.Parser.<*  literalP "symbol" "}"
        ) @> cons
 \end{code}
 
 \begin{code}
 rIgnoreP :: Parser RIgnore
-rIgnoreP =  
-      literalP "name1" "ignore" 
-    *> (     literalP "symbol" "{"
-          *> pLiteralP 
-         <*> many (
+rIgnoreP =
+      literalP "name1" "ignore"
+    ABR.Parser.*> (     literalP "symbol" "{"
+          ABR.Parser.*> pLiteralP
+         ABR.Parser.<*> many (
                   literalP "symbol" ","
-               *> pLiteralP
+               ABR.Parser.*> pLiteralP
              )
-         <*  literalP "symbol" "}" 
+         ABR.Parser.<*  literalP "symbol" "}"
        ) @> cons
 \end{code}
 
 \begin{code}
 rOutputP :: Parser ROutput
-rOutputP =   
-      literalP "name1" "output" 
-    *> (     literalP "symbol" "{"
-          *> taggedLiteralP 
-         <*  literalP "symbol" "}" 
+rOutputP =
+      literalP "name1" "output"
+    ABR.Parser.*> (     literalP "symbol" "{"
+          ABR.Parser.*> taggedLiteralP
+         ABR.Parser.<*  literalP "symbol" "}"
        )
 \end{code}
 
@@ -130,12 +130,12 @@ generated set of facts.
 
 \begin{code}
 generateRuns :: RunFile -> [Run]
-generateRuns (ins,igs,_) = 
-   filter (\qs -> and [or [q' `notElem` qs 
+generateRuns (ins,igs,_) =
+   filter (\qs -> and [or [q' `notElem` qs
                           | q' <- ig] | ig <- igs]) $
    map concat $
    cartProd $
-   map (\qs -> case qs of 
+   map (\qs -> case qs of
       [q] -> [[q], [neg q]]
       _   -> (map (\(b,e,a) -> reverse (map neg b) ++ [e] ++
                   map neg a) . fragments) qs) ins

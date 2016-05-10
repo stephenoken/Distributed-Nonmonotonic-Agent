@@ -8,7 +8,8 @@ module Main (main) where
 \end{code}
 
 \begin{code}
-import System; import CPUTime; import Char
+import System.Environment; import System.CPUTime; import Data.Char; import System.IO
+import Control.Exception
 \end{code}
 
 \begin{code}
@@ -26,7 +27,7 @@ import DInference
 
 \begin{code}
 main :: IO ()
-main = do 
+main = do
    args <- getArgs
    run $ unwords args
 \end{code}
@@ -49,7 +50,7 @@ getPath options = do
    putStr "Theory file name (or \"q\" to quit): "
    path <- getLine
    let path' = trim path
-   case path' of 
+   case path' of
       []  -> getPath options
       "q" -> quit
       _:_ -> openTheory options path' Nothing
@@ -58,7 +59,7 @@ getPath options = do
 \begin{code}
 openTheory :: Options -> FilePath -> Maybe String -> IO ()
 openTheory options path mtl = do
-   source <- catch (readFile path) (\e -> return "\0")
+   source <- catch (readFile path) (\(NoMethodError e) -> return "\0")
    case source of
       "\0" -> do
          putStrLn $ "Error: File " ++ path ++ " is \
@@ -72,7 +73,7 @@ openTheory options path mtl = do
                Nothing -> getPath options
                _       -> quit
          CheckPass t   -> do
-            case (lookupBST "tp" options, 
+            case (lookupBST "tp" options,
 	          lookupBST "td" options) of
 	       (Just FlagMinus,_) ->
 	          putStr $ show $ PrologTheory t
@@ -87,7 +88,7 @@ openTheory options path mtl = do
 	             _ -> case mtl of
                         Nothing    ->
 	                   interactive ls t ot options
-                        Just l -> do 
+                        Just l -> do
 	                   proveOne ls t ot options l
 	                      emptyHistory
 	                      (initPmSyLitHist ot)
@@ -95,7 +96,7 @@ openTheory options path mtl = do
 \end{code}
 
 \begin{code}
-interactive :: SparseSet Literal -> Theory -> OTheory -> 
+interactive :: SparseSet Literal -> Theory -> OTheory ->
    Options -> IO ()
 interactive ls t ot options = do
       putStrLn "Type \"?\" for help."
@@ -104,28 +105,28 @@ interactive ls t ot options = do
    where
    proofLoop :: SparseSet Literal -> OTheory
                 -> Options -> OHist -> FHist -> IO ()
-   proofLoop ls ot options h fh = do 
+   proofLoop ls ot options h fh = do
       putStr "|- "
       input <- getLine
       let input' = words input
       case input' of
-         [] -> 
+         [] ->
 	    proofLoop ls ot options h fh
-         "?" : _ -> do 
+         "?" : _ -> do
 	    showHelp
 	    proofLoop ls ot options h fh
          "q" : _ ->
 	    quit
-         "t" : _ -> do 
+         "t" : _ -> do
 	    putStrLn $ show ot
             proofLoop ls ot options h fh
-         "td" : _ -> do 
+         "td" : _ -> do
 	    putStrLn $ show $ DeloresTheory t
             proofLoop ls ot options h fh
-         "tp" : _ -> do 
+         "tp" : _ -> do
 	    putStrLn $ show $ PrologTheory t
             proofLoop ls ot options h fh
-         "f" : _ -> do 
+         "f" : _ -> do
 	    putStrLn "Those who forget history \
 	             \are destined to repeat it."
             proofLoop ls ot options emptyHistory
@@ -140,25 +141,25 @@ interactive ls t ot options = do
 	          putStr "Current prover: "
 	          case lookupBST "e" options of
 	             Nothing ->
-	                putStrLn $ "nhlt" 
+	                putStrLn $ "nhlt"
 	             Just (ParamValue p) ->
 	                putStrLn p
 	          proofLoop ls ot options h fh
 	       else do
-	          putStrLn $ "Error: No such prover: " 
+	          putStrLn $ "Error: No such prover: "
 	                     ++ cs
 	          proofLoop ls ot options h fh
 	 "l" : [] ->
-	    getPath options 
+	    getPath options
 	 "l" : p: [] ->
-	    openTheory options p Nothing  
+	    openTheory options p Nothing
          _ -> do
-	    (ls', ot', h', fh') <- 
+	    (ls', ot', h', fh') <-
 	       proveOne ls t ot options input h fh
             proofLoop ls' ot' options h' fh'
 \end{code}
 
-\begin{code}   
+\begin{code}
 proveOne :: SparseSet Literal -> Theory -> OTheory
    -> Options -> String  -> OHist -> FHist
    -> IO (SparseSet Literal, OTheory, OHist, FHist)
@@ -196,4 +197,3 @@ showHelp = putStrLn
 quit :: IO ()
 quit = putStrLn "Goodbye."
 \end{code}
-

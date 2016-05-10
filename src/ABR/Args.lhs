@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -37,15 +37,15 @@ import ABR.Data.BSTree; import ABR.Data.Queue
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Data types} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 An \highlighttt{OptSpec} is used to specify the
-types of option expected. 
+types of option expected.
 
 \begin{code}
-data OptSpec = 
+data OptSpec =
    FlagS String | ParamS String | QueueS String
    deriving (Eq, Show)
 \end{code}
@@ -53,7 +53,7 @@ data OptSpec =
 \noindent An option is one of:
 
 \begin{itemize}
-   \item a flag to be set or unset. Specify with 
+   \item a flag to be set or unset. Specify with
       \highlighttt{FlagS}~$\mathit{name}$. Users
       set or unset with \verb"+"$\mathit{name}$ or
       \verb"-"$\mathit{name}$ respectively.
@@ -69,7 +69,7 @@ data OptSpec =
       provide values with
       \verb"-"$\mathit{name}~\mathit{value}_{1}$
       \verb"-"$\mathit{name}~\mathit{value}_{2}~\ldots$.
-\end{itemize}   
+\end{itemize}
 
 \noindent An \highlighttt{OptVal} is used to
 indicate presence of a command line option. Flags
@@ -84,8 +84,8 @@ Missing values for queue parameters might yield an
 empty queue.
 
 \begin{code}
-data OptVal = 
-      FlagPlus | FlagMinus | 
+data OptVal =
+      FlagPlus | FlagMinus |
       ParamValue String | ParamMissingValue |
       ParamQueue (Queue String)
    deriving Show
@@ -111,7 +111,7 @@ $\mathit{options}$ is a BSTree mapping the option
 names to the values found; and $\mathit{leftovers}$
 is a list of any unconsumed arguments, typically
 file names.
-      
+
 \begin{code}
 findOpts :: [OptSpec] -> [String] -> (Options, [String])
 findOpts specs = fo
@@ -120,7 +120,7 @@ findOpts specs = fo
    rep t cs v = updateBST (\x _ -> x) cs v t
    enq t cs v = updateBST enq' cs v t
    enq' :: OptVal -> OptVal -> OptVal
-   enq' (ParamQueue q) (ParamQueue q') = if isEmptyQ q 
+   enq' (ParamQueue q) (ParamQueue q') = if isEmptyQ q
       then ParamQueue q'
       else ParamQueue (attachQ (frontQ q) q')
    fo :: [String] -> (Options, [String])
@@ -148,7 +148,7 @@ findOpts specs = fo
 	          let (t, css'') = fo css'
 	          in (enq t cs (ParamQueue
 	                (attachQ cs' emptyQ)), css'')
-         else 
+         else
 	    let (t, css') = fo css
 	    in (t, (c:cs):css')
 \end{code}
@@ -159,10 +159,10 @@ findOpts specs = fo
 returns the value ({\tt FlagPlus} means {\tt True}) stored
 for the $\mathit{name}$ed flag in $\mathit{options}$ or
 $\mathit{def}$ if it has not been properly specified.
-      
+
 \begin{code}
 lookupFlag :: String -> Options -> Bool -> Bool
-lookupFlag name options def = 
+lookupFlag name options def =
    case lookupBST name options of
       Just FlagPlus  -> True
       Just FlagMinus -> False
@@ -174,10 +174,10 @@ lookupFlag name options def =
 returns the value stored for the $\mathit{name}$ed
 parameter in $\mathit{options}$ or $\mathit{def}$ if it
 has not been properly specified.
-      
+
 \begin{code}
 lookupParam :: String -> Options -> String -> String
-lookupParam name options def = 
+lookupParam name options def =
    case lookupBST name options of
       Just (ParamValue v) -> v
       _                   -> def
@@ -188,12 +188,11 @@ lookupParam name options def =
 returns the list stored for the $\mathit{name}$ed
 queue parameter in $\mathit{options}$ or {\tt []} if it
 has not been properly specified.
-      
+
 \begin{code}
 lookupQueue :: String -> Options -> [String]
-lookupQueue name options = 
+lookupQueue name options =
    case lookupBST name options of
       Just (ParamQueue q) -> extractQ q
       _                   -> []
 \end{code}
-

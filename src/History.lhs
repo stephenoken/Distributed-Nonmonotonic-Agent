@@ -56,7 +56,7 @@ getResult h p = lookupBST p h
 result stored in $h$ for $p$ if it exists.
 
 \begin{code}
-retractProof :: Ord proof => History proof result 
+retractProof :: Ord proof => History proof result
    -> proof -> History proof result
 retractProof h p = deleteBST p h
 \end{code}

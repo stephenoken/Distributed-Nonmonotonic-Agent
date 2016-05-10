@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -32,20 +32,20 @@ module ABR.Data.Queue (
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Reviewed 2009-04-08: Changed to {\tt ABR.\emph{Data}.Queue}.
-   
+
 Reviewed: 2009-04-01. There's nothing in the standard
 libraries that really does this. There are more compicated
-queue pakages in Hackage, but no compeling reason to drop 
+queue pakages in Hackage, but no compeling reason to drop
 this library for them. Possible extensions: maybe some
 instances like {\tt Traversable}, but as needed.
-   
+
 
 \submodule{Data type} %%%%%%%%%%%%%%%%
 
 A \highlighttt{Queue} is a first-in-first-out sequence.
 
 \begin{code}
-type Queue a = 
+type Queue a =
    ([a],[a])
 \end{code}
 
@@ -62,7 +62,7 @@ type Queue a =
 the invariant: a queue is empty or $\mathit{fronts}$ is not empty.
 
 \submodule{Operations} %%%%%%%%%%%%%%%%%%%%%%
-   
+
 \noindent \highlighttt{emptyQ} is an empty queue.
 
 \begin{code}
@@ -80,7 +80,7 @@ isEmptyQ _      = False
 \end{code}
 
 \noindent \highlighttt{attachQ}~$e~q$ attaches $e$ to the back
-of queue $q$.   
+of queue $q$.
 
 \begin{code}
 attachQ :: a -> Queue a -> Queue a
@@ -93,18 +93,18 @@ of queue $q$.
 
 \begin{code}
 frontQ :: Queue a -> a
-frontQ ([],_)      = 
+frontQ ([],_)      =
    error "Can't get frontQ of an empty queue."
 frontQ (front:_,_) = front
 \end{code}
 
 \noindent \highlighttt{detachQ}~$q$ returns the element that was
 at the front of queue $q$ and the $q$ after that element
-has been detached. 
+has been detached.
 
 \begin{code}
 detachQ :: Queue a -> (a, Queue a)
-detachQ ([],_)               = 
+detachQ ([],_)               =
    error "Can't detachQ an empty queue."
 detachQ ([front], backs)     = (front, (reverse backs, []))
 detachQ (front:fronts,backs) = (front, (fronts, backs))

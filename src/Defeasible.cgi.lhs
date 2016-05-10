@@ -1,7 +1,7 @@
 \module{CGI Tool} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This module implements the CGI tool that provides a
-web interface for the \deimos\ system. 
+web interface for the \deimos\ system.
 Section~\ref{CGIUser} describes its use.
 
 \begin{code}
@@ -9,7 +9,7 @@ module Main (main) where
 \end{code}
 
 \begin{code}
-import Directory; import List; import Char
+import System.Directory; import Data.List; import Data.Char
 \end{code}
 
 \begin{code}
@@ -46,42 +46,42 @@ installWhere = "kurango"
 \begin{code}
 infoDir, theoryDir ::  FilePath
 infoDir = if installWhere == "hunchentoot"
-   then 
+   then
       "/Program Files/Apache Group/Apache/htdocs/def-info/"
    else if installWhere == "kurango" then
       "doc/"
-   else 
+   else
       "doc/"
 theoryDir = if installWhere == "hunchentoot"
-   then 
+   then
       "/Program Files/Apache Group/Apache/htdocs/\
       \def-theories/"
    else if installWhere == "kurango" then
       "theories/"
-   else 
+   else
       "theories/"
 \end{code}
 
 \begin{code}
 infoURL, theoryURL :: String
 infoURL = if installWhere == "hunchentoot"
-   then 
+   then
       "http://localhost/def-info/"
    else if installWhere == "kurango" then
       "doc/"
-   else 
+   else
       "doc/"
 theoryURL = if installWhere == "hunchentoot"
-   then 
+   then
       "http://localhost/def-theories/"
    else if installWhere == "kurango" then
       "theories/"
-   else 
+   else
       "theories/"
 \end{code}
 
 {\tt subs~text} prints {\tt text} replacing all occurrences
-of \verb"###I###" with the value of {\tt infoURL}, 
+of \verb"###I###" with the value of {\tt infoURL},
 \verb"###T###" by {\tt theoryURL}, and \verb"###C###" by
 the CGI tool URL. This permits included HTML documents to
 refer back to the tool and information directories.
@@ -126,7 +126,7 @@ main = do
 
 \submodule{Common cosmetic bits} %%%%%%%%%%%%%%%%%%%%%%%%%
 
-{\tt wrap~title~rows} prints the HTML code common to 
+{\tt wrap~title~rows} prints the HTML code common to
 every page. The content of each page must be a sequence
 of table rows. Each page has a title.
 
@@ -141,7 +141,7 @@ wrap title rows = htmlN (do
                   put ": "
                   put $ title
                )
-            tableE [("cellpadding","10"), 
+            tableE [("cellpadding","10"),
                     ("cellspacing","10"),
                     ("width","100%")] $ sequence_ rows
             imgE_ [("src", infoURL ++ "logo.jpg")]
@@ -157,7 +157,7 @@ in a highlight background color. {\tt oops item} displays
 the item in a row with an error-indicating background
 colour.
 \verb"oops'" displays  a plain text message in a PRE
-element. \verb"whoops" does all that and puts it in 
+element. \verb"whoops" does all that and puts it in
 a complete document with a title.
 
 \begin{code}
@@ -179,10 +179,10 @@ oops' = oops . preN . put
 
 \begin{code}
 whoops :: String -> String -> IO ()
-whoops title = wrap title . (: []) . oops' 
+whoops title = wrap title . (: []) . oops'
 \end{code}
 
-{\tt form~query~items} produces a form with 
+{\tt form~query~items} produces a form with
 {\tt query} as the URL query string and containing the
 form elements in {\tt items}
 
@@ -190,7 +190,7 @@ form elements in {\tt items}
 form :: String -> IO () -> IO ()
 form query items = do
    script <- getSCRIPT_NAME
-   formE [("method","post"), 
+   formE [("method","post"),
           ("action",script ++ "?" ++ query)] items
 \end{code}
 
@@ -243,7 +243,7 @@ introMsg = do
 
 \begin{code}
 pickATheory :: IO ()
-pickATheory = form "theory" (do 
+pickATheory = form "theory" (do
       h2N $ put "Select an Example Defeasible Theory"
       fileNames <- getDirectoryContents theoryDir
       let fileNames' = sort $ filter ((== 't') . head
@@ -260,7 +260,7 @@ pickATheory = form "theory" (do
 
 \begin{code}
 theoryOption :: FilePath -> IO ()
-theoryOption file = do 
+theoryOption file = do
    contents <- readFile $ theoryDir ++ "/" ++ file
    optionE [("value",file)] $ put $ trim $ drop 1
       $ trim $ head $ lines $ contents
@@ -274,7 +274,7 @@ trim = dropWhile isSpace . reverse . dropWhile isSpace
 
 \begin{code}
 newTheory :: IO ()
-newTheory = do 
+newTheory = do
    h2N $ put "Create a New Defeasible Theory"
    pN (do
       put "Click "
@@ -292,12 +292,12 @@ where new theories may be typed in.
 \begin{code}
 doNewTheory :: IO ()
 doNewTheory = wrap "New Theory" [high $ form "theory" (do
-      pN (do 
+      pN (do
             put "Type in your new theory. (The syntax \
 	        \for theories is defined "
             link "syntax" $ put "here"
             put ".)"
-            inputE_ [("name","origin"), 
+            inputE_ [("name","origin"),
 	             ("type","hidden"),("value", "form")]
          )
       pN $ textareaE [("name","theory"), ("cols","80"),
@@ -321,7 +321,7 @@ doTheory = do
    lookupGuard  formData ["origin","theory"]
       (\ cs -> whoops title $ "Missing " ++ cs ++ ".")
       (\ [origin,theory] -> do
-         source <- if origin == "file" then 
+         source <- if origin == "file" then
                       readFile $ theoryDir ++ theory
                    else
                       return theory
@@ -341,7 +341,7 @@ emptyCheck :: String -> Check String String String
 emptyCheck item content =
    if and $ map isSpace content then
       CheckFail $ "The " ++ item ++ " is empty."
-   else 
+   else
       CheckPass content
 \end{code}
 
@@ -362,7 +362,7 @@ queryForm th = form "proof" (do
       pN (do
             put "What do you want to prove? "
             inputE_ [("name","taggedliteral"),
-                     ("type","text"), ("size","15")] 
+                     ("type","text"), ("size","15")]
             put " ("
             link "proof-help" $ put "What do I type here?"
             put ")"
@@ -378,7 +378,7 @@ queryForm th = form "proof" (do
                   opt "nt"   (g +++ t)
                   opt "nht"  (g +++ h +++ t)
                   optionE [("value","nhlt"),
-                     ("selected","")] $ put 
+                     ("selected","")] $ put
                      (g +++ h +++ l +++ t)
                   opt "nH"   (g +++ h')
                   opt "nHl"  (g +++ h' +++ l)
@@ -417,11 +417,11 @@ doProof = do
 \end{code}
 
 \begin{code}
-noSemicolons :: String -> String   
+noSemicolons :: String -> String
 noSemicolons cs = case cs of
    []                       -> []
    (';':';':';':';':';':cs) -> '\n' : noSemicolons cs
-   (c:cs)                   -> c : noSemicolons cs 
+   (c:cs)                   -> c : noSemicolons cs
 \end{code}
 
 \begin{code}
@@ -433,7 +433,7 @@ proveIt source q prover =
       &? cyclesCheck &? groundCheck) source  of
       CheckFail msg -> [oops' msg]
       CheckPass t ->
-         showQuery q : 
+         showQuery q :
          case (emptyCheck "query" &? checkParse lexerL
             (total taggedLiteralP) &? checkNoVars) q of
             CheckFail msg -> [oops' msg]
@@ -456,10 +456,10 @@ showQuery q = high (do
 proveIt' :: Theory -> Tagged Literal -> String -> IO ()
 proveIt' t tl prover = do
    let s = getLits tl (getLits t emptySS)
-       ot = makeOTheory s t 
+       ot = makeOTheory s t
    tableE [("cellpadding","10"), ("cellspacing","10"),
 	   ("width","100%")] $ norm (do
-	  putStr "<pre>"    
+	  putStr "<pre>"
           (_,_,_,_,r) <- oprove s t ot emptyBST prover tl
                emptyHistory (initPmSyLitHist ot)
 	  putStr "</pre>"
@@ -471,7 +471,7 @@ proveIt' t tl prover = do
 \submodule{Help pages} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\tt doSyntax} and {\tt doProofHelp} display the
-help pages for this CGI tool. 
+help pages for this CGI tool.
 
 \begin{code}
 doSyntax :: IO ()

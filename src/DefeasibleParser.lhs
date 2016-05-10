@@ -9,6 +9,7 @@ module Main (main) where
 
 \begin{code}
 import System.IO
+import System.Environment  
 \end{code}
 
 \begin{code}

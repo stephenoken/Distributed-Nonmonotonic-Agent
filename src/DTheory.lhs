@@ -5,7 +5,7 @@ theory data types.
 
 \begin{code}
 {-# LANGUAGE MultiParamTypeClasses,
-             TypeSynonymInstances #-}
+             TypeSynonymInstances,FlexibleInstances #-}
 \end{code}
 
 \begin{code}
@@ -108,15 +108,15 @@ rule'P = prologRuleP <|> ruleP
 prologSuperiorityP :: Parser Statement
 prologSuperiorityP
    = literalP "name1" "sup"
-     *> nofail (literalP "symbol" "(")
-     *> nofail (literalP "symbol" "(")
-     *> nofail' "rule expected" rule'P
-     <*> (nofail (literalP "symbol" ")")
-          *> nofail (literalP "symbol" ",")
-          *> nofail (literalP "symbol" "(")
-          *> nofail' "rule expected" rule'P
-          <* nofail (literalP "symbol" ")")
-          <* nofail (literalP "symbol" ")"))
+     ABR.Parser.*> nofail (literalP "symbol" "(")
+     ABR.Parser.*> nofail (literalP "symbol" "(")
+     ABR.Parser.*> nofail' "rule expected" rule'P
+     ABR.Parser.<*> (nofail (literalP "symbol" ")")
+          ABR.Parser.*> nofail (literalP "symbol" ",")
+          ABR.Parser.*> nofail (literalP "symbol" "(")
+          ABR.Parser.*> nofail' "rule expected" rule'P
+          ABR.Parser.<* nofail (literalP "symbol" ")")
+          ABR.Parser.<* nofail (literalP "symbol" ")"))
      @> (\(r1,r2) -> Superiority r1 r2)
 \end{code}
 
@@ -127,8 +127,8 @@ factP = prologLiteralP <|> pLiteralP
 
 \begin{code}
 labeledRuleP :: Parser (LabeledRule Literal)
-labeledRuleP = optional (labelP <* literalP "symbol" ":")
-               <*> rule'P
+labeledRuleP = optional (labelP ABR.Parser.<* literalP "symbol" ":")
+               ABR.Parser.<*> rule'P
 	       @> (\(ls,r) -> case ls of
 	             []  -> Rule (Label "") r
 		     [l] -> Rule l r
@@ -146,7 +146,7 @@ statementP =     prologSuperiorityP
 \begin{code}
 theoryP :: Parser Theory
 theoryP
-   = total (many (statementP <* nofail (
+   = total (many (statementP ABR.Parser.<* nofail (
                                   literalP "symbol" ".")))
      @> makeTheory
      where

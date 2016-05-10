@@ -15,7 +15,7 @@ module DInference(
 \end{code}
 
 \begin{code}
-import Ix
+import Data.Ix
 \end{code}
 
 \begin{code}
@@ -29,9 +29,9 @@ import Literal; import ThreadedTest
 \submodule{Data type definitions} %%%%%%%%%%%%%%%%%%%%%%%%
 
 A tagged literal consists of a literal, a symbol
-to indicate the level of proof required, and a $+$ 
-or $-$ sign to indicate that a proof or proof that 
-it can not be proved is required. 
+to indicate the level of proof required, and a $+$
+or $-$ sign to indicate that a proof or proof that
+it can not be proved is required.
 The proof symbols are defined by
 table~\ref{proofSymbolTable2}.
 
@@ -42,7 +42,8 @@ data ProofSymbol
 \end{code}
 
 \begin{code}
-data (Eq a, Show a, Ord a) => Tagged a
+-- (Eq a, Show a, Ord a) =>
+data Tagged a
    =   Plus  !ProofSymbol !a
      | Minus !ProofSymbol !a
      deriving (Eq, Ord)
@@ -96,8 +97,8 @@ proofSymbolP
 taggedLiteralP :: Parser (Tagged Literal)
 taggedLiteralP
    = (literalP "symbol" "+" <|> literalP "symbol" "-")
-     <*> nofail' "proof symbol expected" proofSymbolP
-     <*> nofail' "literal expected" pLiteralP
+     ABR.Parser.<*> nofail' "proof symbol expected" proofSymbolP
+     ABR.Parser.<*> nofail' "literal expected" pLiteralP
      @> (\((_,c,_),(ps,l)) -> case c of
            "+" -> Plus ps l
 	   "-" -> Minus ps l)
@@ -111,7 +112,7 @@ that the inference conditions are defined in terms of
 to hide (and generalize) the representation of theories,
 labels and rules. Then the inference conditions need only
 be specified once. This class has multiple type parameters,
-and therefore relies on Hugs and GHC extensions. The 
+and therefore relies on Hugs and GHC extensions. The
 parameters {\tt th}, {\tt rul}, and {\tt lit} are the
 names of the theory, rule, and literal types. The type
 for rules must be parameterized by the type for literals,
@@ -135,36 +136,36 @@ in theory {\tt t}. {\tt notFactIn~q~t} returns the
 opposite result.
 
 \begin{code}
-   isFactIn, notFactIn :: (Monad m, ThreadedResult r) => 
-      lit -> th (rul lit)  -> ThreadedTest m r s 
+   isFactIn, notFactIn :: (Monad m, ThreadedResult r) =>
+      lit -> th (rul lit)  -> ThreadedTest m r s
 \end{code}
 
 {\tt rq~t~q} returns the list of rules in {\tt t} that
 have consequent {\tt q}. {\tt rsq~t~q} returns the list
 of strict rules in {\tt t} that have consequent {\tt q}.
-{\tt rsdq~t~q} returns the list of rules in {\tt t} that 
+{\tt rsdq~t~q} returns the list of rules in {\tt t} that
 have consequent {\tt q} and are strict or defeasible.
 
 \begin{code}
    rq, rsq, rsdq :: th (rul lit)  -> lit -> [rul lit]
 \end{code}
-   
+
 {\tt ants~t~r} returns the list of literals that are
 the antecedents of rule {\tt r} in theory {\tt t}.
 
 \begin{code}
-   ants :: th (rul lit)  -> rul lit -> [lit] 
+   ants :: th (rul lit)  -> rul lit -> [lit]
 \end{code}
 
-{\tt beats~t~r1~r2} is a test whether there exists in 
-{\tt t} a priority that asserts that {\tt r1} is 
+{\tt beats~t~r1~r2} is a test whether there exists in
+{\tt t} a priority that asserts that {\tt r1} is
 superior to {\tt r2}. {\tt notBeats~t~r1~r2} returns
 the opposite result.
 
 \begin{code}
-   beats, notBeats :: (Monad m, ThreadedResult r) => 
-      th (rul lit) -> rul lit -> rul lit 
-      -> ThreadedTest m r s 
+   beats, notBeats :: (Monad m, ThreadedResult r) =>
+      th (rul lit) -> rul lit -> rul lit
+      -> ThreadedTest m r s
 \end{code}
 
 
@@ -173,14 +174,14 @@ the opposite result.
 \verb"t |-- tl (|-)" is a test whether the tagged literal
 {\tt tl} can be proved from theory {\tt t}. The definition of
 this function is shown in figure~\ref{infConditsFig} along
-with the inference conditions it implements. 
+with the inference conditions it implements.
 \verb"|-" is the main proof function that is mutually
 recursive with this one. \verb"|-" handles all state
 manipulations and/or I/O.
 
-\begin{code}   
-   (|--) :: (Monad m, ThreadedResult r) => 
-      th (rul lit) -> Tagged lit -> (th (rul lit) -> 
+\begin{code}
+   (|--) :: (Monad m, ThreadedResult r) =>
+      th (rul lit) -> Tagged lit -> (th (rul lit) ->
       Tagged lit -> ThreadedTest m r s)
       -> ThreadedTest m r s
 \end{code}
@@ -197,9 +198,9 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Plus PS_D q) (|-)
-      = q `isFactIn` t ||| 
+      = q `isFactIn` t |||
         tE (rsq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_D a))
-\end{code}  
+\end{code}
 
 \\
 
@@ -207,9 +208,9 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Minus PS_D q) (|-)
-      = q `notFactIn` t &&& 
+      = q `notFactIn` t &&&
         fA (rsq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_D a))
-\end{code}  
+\end{code}
 
 \\
 
@@ -217,14 +218,14 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Plus PS_d q) (|-)
-      = t |- Plus PS_D q ||| 
+      = t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_d a)) &&&
-           t |- Minus PS_D (neg q) &&& 
-           fA (rq t (neg q)) (\s -> 
+           t |- Minus PS_D (neg q) &&&
+           fA (rq t (neg q)) (\s ->
 	      tE (ants t s) (\a -> t |- Minus PS_d a) |||
-              tE (rsdq t q) (\u -> 
+              tE (rsdq t q) (\u ->
 	         fA (ants t u) (\a -> t |- Plus PS_d a) &&& beats t u s))
-\end{code}  
+\end{code}
 
 \\
 
@@ -235,15 +236,15 @@ manipulations and/or I/O.
       = t |- Minus PS_D q &&& (
            fA (rsdq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_d a)) |||
            t |- Plus PS_D (neg q) |||
-           tE (rq t (neg q)) (\s -> 
+           tE (rq t (neg q)) (\s ->
 	      fA (ants t s) (\a -> t |- Plus PS_d a) &&&
-              fA (rsdq t q) (\u -> 
+              fA (rsdq t q) (\u ->
 	         tE (ants t u) (\a -> t |- Minus PS_d a) ||| notBeats t u s)))
 \end{code}
 
 \end{tabular}
 
-\caption{\setMyFontSize\label{infConditsFig}Inference conditions 
+\caption{\setMyFontSize\label{infConditsFig}Inference conditions
 for defeasible logic.}
 
 \end{figure*}
@@ -266,14 +267,14 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Plus PS_da q)  (|-)
-      = t |- Plus PS_D q ||| 
+      = t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_da a)) &&&
-           t |- Minus PS_D (neg q) &&& 
-           fA (rq t (neg q)) (\s -> 
+           t |- Minus PS_D (neg q) &&&
+           fA (rq t (neg q)) (\s ->
 	      tE (ants t s) (\a -> t |- Minus PS_S a) |||
-              tE (rsdq t q) (\u -> 
+              tE (rsdq t q) (\u ->
 	         fA (ants t u) (\a -> t |- Plus PS_da a) &&& beats t u s))
-\end{code}  
+\end{code}
 
 \\
 
@@ -284,11 +285,11 @@ are shown in figure~\ref{infConditsFig2}.
       = t |- Minus PS_D q &&& (
            fA (rsdq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_da a)) |||
            t |- Plus PS_D (neg q) |||
-           tE (rq t (neg q)) (\s -> 
+           tE (rq t (neg q)) (\s ->
 	      fA (ants t s) (\a -> t |- Plus PS_S a) &&&
-              fA (rsdq t q) (\u -> 
+              fA (rsdq t q) (\u ->
 	         tE (ants t u) (\a -> t |- Minus PS_da a) ||| notBeats t u s)))
-\end{code}  
+\end{code}
 
 \\
 
@@ -296,12 +297,12 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Plus PS_S q)  (|-)
-      = t |- Plus PS_D q ||| 
-           tE (rsdq t q) (\r -> 
+      = t |- Plus PS_D q |||
+           tE (rsdq t q) (\r ->
 	      fA (ants t r) (\a -> t |- Plus PS_S a) &&&
-	      fA (rq t (neg q)) (\s -> 
+	      fA (rq t (neg q)) (\s ->
 	         tE (ants t s) (\a -> t |- Minus PS_da a) ||| notBeats t s r))
-\end{code}  
+\end{code}
 
 \\
 
@@ -309,27 +310,27 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Minus PS_S q)  (|-)
-      = t |- Minus PS_D q &&& 
-           fA (rsdq t q) (\r -> 
+      = t |- Minus PS_D q &&&
+           fA (rsdq t q) (\r ->
 	      tE (ants t r) (\a -> t |- Minus PS_S a) |||
-	      tE (rq t (neg q)) (\s -> 
+	      tE (rq t (neg q)) (\s ->
 	         fA (ants t s) (\a -> t |- Plus PS_da a) &&& beats t s r))
-\end{code}  
+\end{code}
 
-\\ 
+\\
 
 
 \raisebox{-1.25em}{$+\partial_{-t}$:} &
 
 \begin{code}
    (|--) t (Plus PS_dt q) (|-)
-      = t |- Plus PS_D q ||| 
+      = t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_dt a) &&&
 	   t |- Minus PS_D (neg q) &&&
 	   fA (rq t (neg q)) (\s ->
 	      beats t r s |||
 	      tE (ants t s) (\a -> t |- Minus PS_dt a)))
-\end{code}  
+\end{code}
 
 \\
 
@@ -343,13 +344,13 @@ are shown in figure~\ref{infConditsFig2}.
 	   tE (rq t (neg q)) (\s ->
 	      notBeats t r s &&&
 	      fA (ants t s) (\a -> t |- Plus PS_dt a))))
-\end{code}  
+\end{code}
 
 \\
 
 \end{tabular}
 
-\caption{\setMyFontSize\label{infConditsFig2}Inference conditions 
+\caption{\setMyFontSize\label{infConditsFig2}Inference conditions
 for variants of defeasible logic.}
 
 \end{figure*}
@@ -379,9 +380,9 @@ instance (Show a, Eq a, Ord a) => Show (Tagged a) where
 
 \begin{code}
    showsPrec p t = case t of
-      Plus ps q  -> showChar '+' . shows ps . showChar ' ' 
+      Plus ps q  -> showChar '+' . shows ps . showChar ' '
                     . shows q
-      Minus ps q -> showChar '-' . shows ps . showChar ' ' 
+      Minus ps q -> showChar '-' . shows ps . showChar ' '
                     . shows q
 \end{code}
 
@@ -389,7 +390,7 @@ instance (Show a, Eq a, Ord a) => Show (Tagged a) where
 Extracting literal names
 
 \begin{code}
-instance (HasLits a, Show a, Eq a, Ord a) => 
+instance (HasLits a, Show a, Eq a, Ord a) =>
    HasLits (Tagged a) where
 \end{code}
 
@@ -402,7 +403,7 @@ instance (HasLits a, Show a, Eq a, Ord a) =>
 Detecting variable names.
 
 \begin{code}
-instance (HasVarNames a, Show a, Ord a) => 
+instance (HasVarNames a, Show a, Ord a) =>
    HasVarNames (Tagged a) where
 \end{code}
 

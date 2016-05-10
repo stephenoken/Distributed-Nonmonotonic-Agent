@@ -3,32 +3,32 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 \module{Graphs} %%%%%%%%%%%%%%%%%%%%%
 
-Module \highlighttt{ABR.Graphs} implements a directed, 
+Module \highlighttt{ABR.Graphs} implements a directed,
 unweighted graph as an ADT. This is \emph{UNDER CONSTRUCTION}.
 This implementation closely follows that described
 by Rabhi and Lapalme~\cite{rabhi:99} and
-Launchbury~\cite{Launchbury:95}. 
+Launchbury~\cite{Launchbury:95}.
 
 \begin{code}
 module ABR.Graph (
-      Graph(..), SGraph, mapG, transposeG 
+      Graph(..), SGraph, mapG, transposeG
       -- isReachable, reachable, isCyclic
    ) where
 \end{code}
@@ -44,7 +44,7 @@ import ABR.SparseSet
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Graph abstract data type} %%%%%%%%%%%%%%%%%%%%%
 
@@ -60,21 +60,21 @@ here.
 \begin{code}
 type Edge v = (v,v)
 \end{code}
- 
+
 A graph $G = (V, E)$ consists of a set of edges $E$ that
-connect a set of vertices $V$. The set of edges $E$ is a 
+connect a set of vertices $V$. The set of edges $E$ is a
 relation on $V$. If $G$ is a directed graph, $E$ is not
 symmetric. The number of vertices is $|V|$ and the number
 of edges is $|E|$.
 
-A graph, as an abstract data type is defined by the 
+A graph, as an abstract data type is defined by the
 methods of this type class.
 
 \begin{code}
 class Graph g where
 \end{code}
-   
-\noindent {\tt mkGraph}~$v$~$v'$~$E$ builds a graph 
+
+\noindent {\tt mkGraph}~$v$~$v'$~$E$ builds a graph
 $(V, E)$. The set of vertices $V$ assumed to exist is the
 range $[v..v']$. $E$ is the relation defining the edges.
 
@@ -82,7 +82,7 @@ range $[v..v']$. $E$ is the relation defining the edges.
    mkGraph :: Ix v => v -> v -> [Edge v] -> g v
 \end{code}
 
-\noindent {\tt vertices}~$G$ returns the list of vertices 
+\noindent {\tt vertices}~$G$ returns the list of vertices
 $V$ in graph $G$.
 
 \begin{code}
@@ -96,15 +96,15 @@ of the vertices $V$ in graph $G$.
    boundsG :: Ix v => g v -> (v,v)
 \end{code}
 
-\noindent {\tt edges}~$G$ returns the list of edges $E$ 
+\noindent {\tt edges}~$G$ returns the list of edges $E$
 in graph $G$.
 
 \begin{code}
    edges :: Ix v => g v -> [Edge v]
 \end{code}
 
-\noindent {\tt adjacent}~$G$~$v$ returns the list of 
-vertices in graph $G$ that can be reached from vertex $v$ 
+\noindent {\tt adjacent}~$G$~$v$ returns the list of
+vertices in graph $G$ that can be reached from vertex $v$
 in one step.
 
 \begin{code}
@@ -134,7 +134,7 @@ data structure. The following is likely to be suitable
 when the graph is sparse.
 
 \begin{code}
-newtype SGraph vertex =  
+newtype SGraph vertex =
    SGraph (Array vertex (SparseSet vertex))
    deriving (Show)
 \end{code}
@@ -160,7 +160,7 @@ instance Graph SGraph where
 \end{code}
 
 \begin{code}
-   edges (SGraph g) = 
+   edges (SGraph g) =
       [(v,v') | v <- indices g, v' <- flattenSS (g!v)]
 \end{code}
 
@@ -206,7 +206,7 @@ gb = mkGraph 0 9 [
 
 \submodule{Graph Operations} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-{\tt mapG}~$f$~$v$~$v'$~$G$ builds a new graph $G'$ 
+{\tt mapG}~$f$~$v$~$v'$~$G$ builds a new graph $G'$
 formed by applying $f$ to every edge in $G$, such that:
 \begin{enumerate}
    \item $G  = (V , E )$
@@ -226,7 +226,7 @@ $G$.
 
 \begin{code}
 transposeG :: (Ix v, Graph g) => g v -> g v
-transposeG g = 
+transposeG g =
    let (v,v') = boundsG g
    in mapG (\(v,v') -> (v',v)) v v' g
 \end{code}
@@ -235,7 +235,7 @@ transposeG g =
 
 \submodule{Reachability} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-{\tt isReachable g v v'} returns {\tt True} iff a vertex 
+{\tt isReachable g v v'} returns {\tt True} iff a vertex
 {\tt v'} in graph {\tt g} is reachable from vertex {\tt v}.
 A depth-first search is used. This implementation uses
 a mutable array so that already visited nodes can be
@@ -261,7 +261,7 @@ isReachable g v v' = runST (do
 \end{haddock}
 
 {\tt reachable g v} returns the list of vertices in
-graph {\tt g} that are reachable from vertex 
+graph {\tt g} that are reachable from vertex
 {\tt v'}. A depth-first search is used. This
 implementation uses a mutable array so that already
 visited nodes can be skipped in constant time.
@@ -405,7 +405,7 @@ dff g = dfs g (vertices g)
 generate :: Graph -> Vertex -> Tree Vertex
 generate g v = Node v (map (generate g) (g ! v))
 
-type Set s = STArray s Vertex Bool 
+type Set s = STArray s Vertex Bool
 
 mkEmpty :: Bounds -> ST s (Set s)
 mkEmpty bnds = newArray bnds False
@@ -456,7 +456,7 @@ forward g tree pre = mapT select g
 --		select v ws = [ w | w <- ws, pre!v < pre!w] \\ tree ! v
 
 ---------------------------------------------------------
--- All Paths 
+-- All Paths
 ---------------------------------------------------------
 
 type Path = [Vertex]
@@ -514,7 +514,7 @@ execute a _ = putStr "I don't know the option, "	>>
 		putStr "\n"								>>
 		printUsage
 
-printUsage = getProgName	>>= \pname -> 
+printUsage = getProgName	>>= \pname ->
 		putStr pname		>>
 		putStr " ["			>>
 		putStr "-pre-order"	>>
@@ -530,10 +530,10 @@ printUsage = getProgName	>>= \pname ->
 		putStr "\n"
 
 main = getArgs >>= \args ->
-	case args of 
+	case args of
 		[] 			-> printUsage
 		(a:[])		-> execute a ""
-		(a:f:_)		-> execute a f 
+		(a:f:_)		-> execute a f
 
 ex1 = buildG ('a', 'j') [
 	('a', 'j'),
@@ -549,4 +549,3 @@ ex1 = buildG ('a', 'j') [
 	('g', 'f'),
 	('g', 'b')]
 \end{Verbatim}
-

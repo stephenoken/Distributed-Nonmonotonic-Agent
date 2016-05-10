@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -22,7 +22,7 @@
 \label{parserModule}
 
 The \highlighttt{ABR.Parser.Lexers} module provides some
-frequently used lexers for common syntatic elements. 
+frequently used lexers for common syntatic elements.
 
 \begin{code}
 module ABR.Parser.Lexers (
@@ -43,7 +43,7 @@ import ABR.Parser.Pos; import ABR.Parser
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Reviewed 2009-04-13: Split from {\tt ABR.Parser}.
-   
+
 
 \submodule{Frequently used lexers} %%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,15 +92,15 @@ dropWhite = tagFilter " "
 
 \noindent Strings are delimited by double quotes and may
 extend across many lines. Use two double quotes for one,
-{\it \`{a} la} Pascal. 
+{\it \`{a} la} Pascal.
 
 \InputEBNF{Configs}{string}
 
 \begin{code}
 stringL :: Lexer
-stringL = 
+stringL =
    literalL '"'
-   <**> (many (     tokenL "\"\"" 
+   <**> (many (     tokenL "\"\""
                 <|> satisfyL (/= '"') "") *%> "")
    <**> literalL '"'
    %> "string"
@@ -123,10 +123,10 @@ unsigned fractional number with no exponent.
 
 \begin{code}
 fixedL :: Lexer
-fixedL = 
+fixedL =
    cardinalL
    <**> soft (optional (
-           literalL '.' 
+           literalL '.'
            <**> soft (optional cardinalL)
         ))
    %> "fixed"
@@ -139,7 +139,7 @@ unsigned floating point number.
 
 \begin{code}
 floatL :: Lexer
-floatL = 
+floatL =
    fixedL
    <**> soft (optional (
            (literalL 'e' <|> literalL 'E')
@@ -158,7 +158,7 @@ signed whole number.
 
 \begin{code}
 signedCardinalL :: Lexer
-signedCardinalL = 
+signedCardinalL =
    soft (optional (literalL '-')) <**> cardinalL
    %> "signedCardinal"
 \end{code}
@@ -170,7 +170,7 @@ signed fixed number.
 
 \begin{code}
 signedFixedL :: Lexer
-signedFixedL = 
+signedFixedL =
    soft (optional (literalL '-')) <**> fixedL
    %> "signedFixed"
 \end{code}
@@ -179,8 +179,7 @@ signedFixedL =
 
 \begin{code}
 signedFloatL :: Lexer
-signedFloatL = 
+signedFloatL =
    soft (optional (literalL '-')) <**> floatL
    %> "signedFloat"
 \end{code}
-

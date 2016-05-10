@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -21,7 +21,7 @@
 \module{CGI Programming} %%%%%%%%%%%%
 
 Module \highlighttt{ABR.CGI} implements support for
-Common Gateway Interface (CGI) programming. 
+Common Gateway Interface (CGI) programming.
 
 \begin{code}
 module ABR.CGI (
@@ -51,7 +51,7 @@ module ABR.CGI (
 
 \begin{code}
 import Data.Char; import System.Environment; import Numeric
-import Data.List
+import Data.List; import Control.Exception
 \end{code}
 
 \begin{code}
@@ -62,7 +62,7 @@ import ABR.Text.Markup
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Mime header} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,7 +92,7 @@ printMimeHeader = putStr mimeHeader
 %
 %\begin{code}
 %encodeHTML, encodeHTML' :: Char -> String
-%[-CGI.tex] 
+%[-CGI.tex]
 %encodeHTML c = case c of
 %   '<' -> "&lt;"
 %   '>' -> "&gt;"
@@ -108,7 +108,7 @@ printMimeHeader = putStr mimeHeader
 %         "&#" ++ show (fromEnum c) ++ ";"
 %      else
 %         [c]
-%[+CGI.tex] 
+%[+CGI.tex]
 %\end{code}
 %
 %\noindent \highlighttt{makeHTMLSafe}~$\mathit{cs}$ encodes
@@ -121,10 +121,10 @@ printMimeHeader = putStr mimeHeader
 %
 %\begin{code}
 %makeHTMLSafe, makeHTMLSafe' :: String -> String
-%[-CGI.tex] 
+%[-CGI.tex]
 %makeHTMLSafe  = concatMap encodeHTML
 %makeHTMLSafe' = concatMap encodeHTML'
-%[+CGI.tex] 
+%[+CGI.tex]
 %\end{code}
 
 \noindent \highlighttt{put}~$\mathit{cs}$ prints $\mathit{cs}$ with
@@ -218,16 +218,16 @@ empty element its $\mathit{tag}$ and $\mathit{attributes}$.
 
 \begin{code}
 baseE_, isindexE_, linkE_, metaE_, nextidE_,
-   inputE_, hrE_, brE_, imgE_ 
+   inputE_, hrE_, brE_, imgE_
    :: HAttributes -> IO ()
 baseE_    = emptyElement "base"
-isindexE_ = emptyElement "isindex" 
+isindexE_ = emptyElement "isindex"
 linkE_    = emptyElement "link"
 metaE_    = emptyElement "meta"
-nextidE_  = emptyElement "nextid"   
+nextidE_  = emptyElement "nextid"
 inputE_   = emptyElement "input"
-hrE_      = emptyElement "hr"    
-brE_      = emptyElement "br"   
+hrE_      = emptyElement "hr"
+brE_      = emptyElement "br"
 imgE_     = emptyElement "img"
 \end{code}
 
@@ -238,7 +238,7 @@ empty element with its $\mathit{tag}$ and no attributes.
 \indextt{brN\_}
 
 \begin{code}
-isindexN_, hrN_, brN_       
+isindexN_, hrN_, brN_
    :: IO ()
 isindexN_ = isindexE_ []
 hrN_      = hrE_      []
@@ -247,7 +247,7 @@ brN_      = brE_      []
 
 \noindent \highlightNoindex{$\mathit{tag}${\tt E}}~$\mathit{attributes}~\mathit{contents}$
 prints a non-empty element with its $\mathit{tag}$,
-$\mathit{attributes}$ and $\mathit{contents}$. 
+$\mathit{attributes}$ and $\mathit{contents}$.
 \indextt{htmlE}
 \indextt{headE}
 \indextt{titleE}
@@ -311,58 +311,58 @@ htmlE, headE, titleE, bodyE, addressE, blockquoteE,
    smallE, bigE, textareaE, h1E, h2E, h3E, h4E,
    h5E, h6E
    :: HAttributes -> IO () -> IO ()
-htmlE       = element "html"       
-headE       = element "head"        
-titleE      = element "title"       
-bodyE       = element "body"        
-addressE    = element "address"     
+htmlE       = element "html"
+headE       = element "head"
+titleE      = element "title"
+bodyE       = element "body"
+addressE    = element "address"
 blockquoteE = element "blockquote"
-formE       = element "form"       
+formE       = element "form"
 selectE     = element "select"
 optionE     = element "option"
-dlE         = element "dl"   
-dtE         = element "dt"         
-ddE         = element "dd"          
-olE         = element "ol"          
-ulE         = element "ul"          
-dirE        = element "dir"         
-menuE       = element "menu"        
-liE         = element "li"        
-pE          = element "p"        
-preE        = element "pre"        
+dlE         = element "dl"
+dtE         = element "dt"
+ddE         = element "dd"
+olE         = element "ol"
+ulE         = element "ul"
+dirE        = element "dir"
+menuE       = element "menu"
+liE         = element "li"
+pE          = element "p"
+preE        = element "pre"
 aE          = element "a"
 mapE        = element "map"
 areaE       = element "area"
-citeE       = element "cite"        
-codeE       = element "code"        
-emE         = element "em"        
-kbdE        = element "kbd"        
-sampE       = element "samp"        
-strongE     = element "strong"     
-varE        = element "var"       
-bE          = element "b"       
-iE          = element "i"       
-ttE         = element "tt"       
-uE          = element "u"       
-tableE      = element "table"       
-captionE    = element "caption"     
-trE         = element "tr"      
-thE         = element "th"      
-tdE         = element "td"      
+citeE       = element "cite"
+codeE       = element "code"
+emE         = element "em"
+kbdE        = element "kbd"
+sampE       = element "samp"
+strongE     = element "strong"
+varE        = element "var"
+bE          = element "b"
+iE          = element "i"
+ttE         = element "tt"
+uE          = element "u"
+tableE      = element "table"
+captionE    = element "caption"
+trE         = element "tr"
+thE         = element "th"
+tdE         = element "td"
 divE        = element "div"
-subE        = element "sub"      
-supE        = element "sup"      
-centerE     = element "center"      
+subE        = element "sub"
+supE        = element "sup"
+centerE     = element "center"
 fontE       = element "font"
-smallE      = element "small"      
-bigE        = element "big"      
+smallE      = element "small"
+bigE        = element "big"
 textareaE   = element "textarea"
-h1E         = element "h1"      
-h2E         = element "h2"      
-h3E         = element "h3"      
-h4E         = element "h4"      
-h5E         = element "h5"      
-h6E         = element "h6"      
+h1E         = element "h1"
+h2E         = element "h2"
+h3E         = element "h3"
+h4E         = element "h4"
+h5E         = element "h5"
+h6E         = element "h6"
 \end{code}
 
 \noindent \highlightNoindex{$\mathit{tag}${\tt N}}~$\mathit{contents}$
@@ -418,7 +418,7 @@ htmlN, headN, titleN, bodyN, addressN, blockquoteN,
    preN, citeN, codeN, emN, kbdN, sampN, strongN,
    varN, bN, iN, ttN, uN, tableN, captionN, trN,
    thN, tdN, subN, supN, centerN, smallN, bigN,
-   h1N, h2N, h3N, h4N, h5N, h6N         
+   h1N, h2N, h3N, h4N, h5N, h6N
    :: IO () -> IO ()
 htmlN       = htmlE       []
 headN       = headE       []
@@ -437,7 +437,7 @@ liN         = liE         []
 pN          = pE          []
 preN        = preE        []
 citeN       = citeE       []
-codeN       = codeE       [] 
+codeN       = codeE       []
 emN         = emE         []
 kbdN        = kbdE        []
 sampN       = sampE       []
@@ -451,7 +451,7 @@ tableN      = tableE      []
 captionN    = captionE    []
 trN         = trE         []
 thN         = thE         []
-tdN         = tdE         [] 
+tdN         = tdE         []
 subN        = subE        []
 supN        = supE        []
 centerN     = centerE     []
@@ -478,7 +478,7 @@ htmlError :: String -> IO ()
 htmlError message = htmlN (do
    headN (titleN (putStr "ERROR"))
    bodyN (pN (put message))
-  )        
+  )
 \end{code}
 
 \submodule{CGI inputs} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -490,7 +490,7 @@ found or empty.
 
 \begin{code}
 getEnvVar :: String -> IO String
-getEnvVar name = (catch (getEnv name) (\e -> return []))
+getEnvVar name = (catch (getEnv name) (\(NoMethodError e) -> return []))
 \end{code}
 
 \noindent \highlighttt{getQUERY\_STRING} returns
@@ -503,7 +503,7 @@ returns the URL of the directory the CGI binary is
 in.
 
 \begin{code}
-getQUERY_STRING, getPATH_INFO, getSCRIPT_NAME, 
+getQUERY_STRING, getPATH_INFO, getSCRIPT_NAME,
    getScriptDirectory :: IO String
 getQUERY_STRING = getEnvVar "QUERY_STRING"
 getPATH_INFO = getEnvVar "PATH_INFO"
@@ -520,11 +520,11 @@ standard input.
 
 \begin{code}
 getCONTENT_LENGTH :: IO Int
-getCONTENT_LENGTH = do 
+getCONTENT_LENGTH = do
    contentLength <- getEnvVar "CONTENT_LENGTH"
    return (if contentLength == []
            then 0
-           else read contentLength) 
+           else read contentLength)
 \end{code}
 
 \noindent \highlighttt{getFormData} reads standard
@@ -533,10 +533,10 @@ them and returns them in a binary search tree.
 
 \begin{code}
 getFormData :: IO (BSTree String String)
-getFormData = do 
+getFormData = do
       contentLength <- getCONTENT_LENGTH
       cs <- getContents
-      return $ pairs2BST $ decodeForm $ 
+      return $ pairs2BST $ decodeForm $
          take contentLength cs
    where
    decodeForm :: String -> [(String,String)]
@@ -551,14 +551,14 @@ getFormData = do
       in (decode name, decode value)
    decode :: String -> String
    decode cs = case cs of
-      []                 -> 
+      []                 ->
          []
-      '+' : xs           -> 
+      '+' : xs           ->
          ' ' : decode xs
-      '%' : x1 : x2 : xs -> 
+      '%' : x1 : x2 : xs ->
          toEnum ((fst . head . readHex) [x1,x2])
             : decode xs
-      x : xs             -> 
+      x : xs             ->
          x : decode xs
 \end{code}
 
@@ -578,13 +578,13 @@ getFormData' = do
        return $ pairs2BST $ decodeForm $ take contentLength cs
    where
    decodeForm :: String -> [(String, String)]
-   decodeForm cs = 
+   decodeForm cs =
       let cs' = dropWhile (/= '-') cs
           (bs, cs'') = break isControl cs'
           css = init (chops ("\r\n" ++ bs) cs'')
       in concatMap pairs css
    pairs :: String -> [(String,String)]
-   pairs cs = 
+   pairs cs =
       let cs' = dropWhile (/= ';') cs
           '"' : cs'' = dropWhile (/= '"') cs'
           (name,cs''') = break (== '"') cs''
@@ -600,4 +600,3 @@ getFormData' = do
          else
             [(name, drop 5 cs''')]
 \end{code}
-

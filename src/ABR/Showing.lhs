@@ -3,17 +3,17 @@
 
 % ABRHLibs -- a personal library of Haskell modules
 % Copyright (C) 2007, 2008,  Andrew Rock
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -26,7 +26,7 @@ get control of numeric precision.
 
 \begin{code}
 module ABR.Showing (
-   showWithSep, showWithTerm, FormattedDouble(..), 
+   showWithSep, showWithTerm, FormattedDouble(..),
    makeFormattedDouble, showFD
 ) where
 \end{code}
@@ -38,7 +38,7 @@ import Numeric
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
 
 Requires review.
-   
+
 
 \submodule{Adding Delimiters} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -58,7 +58,7 @@ showWithSep s xs = case xs of
    []     -> id
    [x]    -> shows x
    (x:xs) -> shows x . showString s . showWithSep s xs
-showWithTerm s xs = case xs of 
+showWithTerm s xs = case xs of
    [] -> id
    xs -> foldr1 (.) [shows x . showString s | x <- xs]
 \end{code}
@@ -96,7 +96,7 @@ instance Show FormattedDouble where
 \highlighttt{makeFormattedDouble}~$\mathit{format}~x$
 makes a {\tt FormattedDouble} from a {\tt Double} $x$
 and a string that describes the format,
-$\mathit{format}$, of the form 
+$\mathit{format}$, of the form
 \verb+("f" | "e" | "g") {digit}+, {\it e.g.} \verb+"f2"+.
 
 \begin{code}
@@ -117,7 +117,7 @@ shows $x$ using the format described by $\mathit{format}$.
 
 \begin{code}
 showFD :: String -> Double -> String
-showFD format x = show (makeFormattedDouble format x) 
+showFD format x = show (makeFormattedDouble format x)
 \end{code}
 
 %\subsubmodule{Data types} %%%%%%%%%%
@@ -140,7 +140,7 @@ showFD format x = show (makeFormattedDouble format x)
 %\begin{code}
 %class ShowFormattedNum a where
 %\end{code}
-%   
+%
 %\begin{code}
 %   showF1 :: a -> String
 %\end{code}
@@ -167,4 +167,3 @@ showFD format x = show (makeFormattedDouble format x)
 %   showF1 = show . DoubleF1
 %\end{code}
 %[+Showing.tex]
-
