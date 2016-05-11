@@ -12,6 +12,6 @@ R1: {fr} => r. % Fred appears to be red
 {later} => b.
 R2: {fr} => later. % appears to be no longer red
 
-% Meryl tell me that I am wearing I_am_wearing_blue_tinted_glasses
+% Meryl tells me that I am wearing I_am_wearing_blue_tinted_glasses
 {glasses} => ~later.
-R5: {fr} => glasses.
+R3: {fr} => glasses.
