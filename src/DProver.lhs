@@ -199,6 +199,7 @@ quit = putStrLn "Goodbye."
 doRunFile :: Theory -> Options -> FilePath -> IO ()
 doRunFile t@(Theory fs rs ps) options rFile = do
    source <- catch (readFile rFile) (\(NoMethodError e) -> return "\0")
+   print rFile
    case source of
       "\0" -> putStrLn $ "Can't read file: " ++ rFile
       _    -> case checkParse lexerL runFileP source of
