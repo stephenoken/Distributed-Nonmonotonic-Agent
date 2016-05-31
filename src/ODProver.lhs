@@ -23,6 +23,7 @@ import ABR.Parser.Checks
 import Literal; import DTheory; import Priority
 import DefeasibleLexer; import ODTheory; import History
 import DInference
+import Debug.Trace
 \end{code}
 
 \begin{code}
@@ -35,7 +36,7 @@ main = do
 \begin{code}
 run :: String -> IO ()
 run args = do
-   let (options,others) =
+   let (options,others) = trace ("Hello World")
           findOpts [ParamS "e", FlagS "t", FlagS "td",
              FlagS "tp"] (words args)
    case others of
