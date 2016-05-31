@@ -8,10 +8,10 @@ fr. % I am looking at Fred
 R1: {fr} => r. % Fred appears to be red
 
 % I look at Fred later on
-{later} => ~r.
-{later} => b.
-R2: {fr} => later. % appears to be no longer red
+R3: {later} => ~r.
+R4: {later} ~> b.
+R5: {fr} => later. % appears to be no longer red
 
 % Meryl tells me that I am wearing I_am_wearing_blue_tinted_glasses
-{glasses} => ~later.
-R3: {fr} => glasses.
+R6: {glasses} ~> ~later. % Fred might not be blue
+R7: {fr} => glasses.
