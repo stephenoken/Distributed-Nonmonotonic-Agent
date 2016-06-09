@@ -24,6 +24,8 @@ import ABR.Args; import ABR.Data.BSTree
 import Literal; import DRule; import Priority
 import ThreadedTest; import ProofResult
 import History; import DTheory; import DInference
+import Debug.Trace
+import Control.Concurrent (forkIO)
 \end{code}
 
 \submodule{Defeasible logic instance} %%%%%%%%%%%%%%%%%%%
@@ -83,9 +85,8 @@ with no trace, no history and therefore no loop checking,
 and not well founded.
 
 \begin{code}
-prove_ :: Theory -> Tagged Literal
-	  -> ThreadedTest Maybe ProofResult ()
-prove_ t tl () = (t |-- tl) prove_ ()
+prove_ :: Theory -> Tagged Literal -> ThreadedTest Maybe ProofResult ()
+prove_ t tl () = trace ("t " ++ show t) (t |-- tl) prove_ ()
 \end{code}
 
 
@@ -95,10 +96,9 @@ prove_ t tl () = (t |-- tl) prove_ ()
 of subgoals required to do so.
 
 \begin{code}
-prove_n :: Theory -> Tagged Literal
-	   -> ThreadedTest Maybe ProofResult Int
+prove_n :: Theory -> Tagged Literal -> ThreadedTest Maybe ProofResult Int
 prove_n t tl ng = do
-   (r, ng') <- (t |-- tl) prove_n ng
+   (r, ng') <- (t |-- tl) prove_n (trace ("NG " ++ show ng) ng)
    return (r, ng' + 1)
 \end{code}
 
@@ -108,9 +108,9 @@ where {\tt r} is the result of trying to prove tagged
 literal {\tt tl} with theory {\tt t}. A trace is printed.
 
 \begin{code}
-prove_t :: Theory -> Tagged Literal
-	   -> ThreadedTest IO ProofResult String
+prove_t :: Theory -> Tagged Literal -> ThreadedTest IO ProofResult String
 prove_t t tl indent = do
+   putStrLn ("In Prove T")
    putStrLn (indent ++ "To Prove: " ++ show tl)
    (r, _) <-
       (t |-- tl) prove_t (".  " ++ indent)
@@ -125,9 +125,9 @@ literal {\tt tl} with theory {\tt t} and {\tt ng} is the
 number of subgoals required to do so. A trace is printed.
 
 \begin{code}
-prove_nt :: Theory -> Tagged Literal
-	    -> ThreadedTest IO ProofResult (Int,String)
+prove_nt :: Theory -> Tagged Literal -> ThreadedTest IO ProofResult (Int,String)
 prove_nt t tl (ng,indent) = do
+   putStrLn ("In Prove NT")
    putStrLn (indent ++ "To Prove: " ++ show tl)
    (r, (ng',_)) <-
       (t |-- tl) prove_nt (ng, ".  " ++ indent)
@@ -153,8 +153,7 @@ history. This prover avoids redoing prior proofs, but
 does not perform loop checking.
 
 \begin{code}
-prove_nh :: Theory -> Tagged Literal
-	    -> ThreadedTest Maybe ProofResult (Int, Hist)
+prove_nh :: Theory -> Tagged Literal -> ThreadedTest Maybe ProofResult (Int, Hist)
 prove_nh t tl (ng,h) = case getResult h tl of
    Just r ->
       return (r, (ng,h))
@@ -174,8 +173,7 @@ redoing prior proofs, but does not perform loop
 checking. A trace is printed.
 
 \begin{code}
-prove_nht
-   :: Theory -> Tagged Literal
+prove_nht :: Theory -> Tagged Literal
       -> ThreadedTest IO ProofResult (Int,Hist,String)
 prove_nht t tl (ng,h,indent) = case getResult h tl of
    Just r -> do
@@ -183,6 +181,7 @@ prove_nht t tl (ng,h,indent) = case getResult h tl of
                 ++ show tl)
       return (r, (ng,h,indent))
    Nothing -> do
+      putStrLn ("In Prove NHT")
       putStrLn (indent ++ "To Prove: " ++ show tl)
       (r, (ng',h',_)) <-
          (t |-- tl) prove_nht (ng, h, ".  " ++ indent)
@@ -200,8 +199,7 @@ history. This prover avoids redoing prior proofs, and
 performs loop checking.
 
 \begin{code}
-prove_nhl :: Theory -> Tagged Literal
-	    -> ThreadedTest Maybe ProofResult (Int, Hist)
+prove_nhl :: Theory -> Tagged Literal -> ThreadedTest Maybe ProofResult (Int, Hist)
 prove_nhl t tl (ng,h) = case getResult h tl of
    Just Pending ->
       return (Bottom, (ng, addProof h tl Bottom))
@@ -224,10 +222,8 @@ history. This prover avoids redoing prior proofs, and
 performs loop checking. A trace is printed.
 
 \begin{code}
-prove_nhlt
-   :: Theory -> Tagged Literal
-      -> ThreadedTest IO ProofResult (Int, Hist, String)
-prove_nhlt t tl (ng,h,indent) = case getResult h tl of
+prove_nhlt :: Theory -> Tagged Literal -> ThreadedTest IO ProofResult (Int, Hist, String)
+prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nhlt") getResult h tl of
    Just Pending -> do
       putStrLn (indent ++ "Loop detected: " ++ show tl)
       return (Bottom, (ng, addProof h tl Bottom, indent))
@@ -236,10 +232,10 @@ prove_nhlt t tl (ng,h,indent) = case getResult h tl of
                 ++ show tl)
       return (r, (ng, h, indent))
    Nothing -> do
+      -- putStrLn ("In  Prove NHLT")
       putStrLn (indent ++ "To Prove: " ++ show tl)
-      (r, (ng',h',_)) <-
-         (t |-- tl) prove_nhlt
-	    (ng, addProof h tl Pending, ".  " ++ indent)
+      -- putStrLn ("History " ++ show h)
+      (r, (ng',h',_)) <- (t |-- tl)  prove_nhlt (ng, addProof h tl Pending, ".  " ++ indent)
       putStrLn (indent ++ show r ++ ": " ++ show tl)
       let h'' = case r of
              Bottom -> h
@@ -302,6 +298,7 @@ prove_nhlwt t tl (ng,h,indent) = case getResult h tl of
                 ++ show tl)
       return (r, (ng, h, indent))
    Nothing -> do
+      putStrLn ("In Prove NTLWT")
       putStrLn (indent ++ "To Prove: " ++ show tl)
       (r, (ng',h',_)) <-
          (t |-- tl) prove_nhlwt

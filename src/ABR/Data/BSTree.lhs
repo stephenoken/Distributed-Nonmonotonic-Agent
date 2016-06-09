@@ -30,6 +30,7 @@ module ABR.Data.BSTree (
       flattenBST, domBST, ranBST, countBST, leftBST,
       rightBST, mapBST, pairs2BST, list2BST
    ) where
+import Debug.Trace
 \end{code}
 
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%
@@ -219,9 +220,9 @@ lookupBST :: Ord k => k -> BSTree k v -> Maybe v
 lookupBST k Empty
    = Nothing
 lookupBST k' (Node k v l r _)
-   | k' < k    = lookupBST k' l
-   | k' == k   = Just v
-   | otherwise = lookupBST k' r
+   | k' < k    = trace("In BSTree.lhs lookupBST line 217 --> k' < k ")lookupBST k' l
+   | k' == k   = trace("In BSTree.lhs lookupBST line 217 --> k' == k ") Just v
+   | otherwise = trace("In BSTree.lhs lookupBST line 217 --> otherwise") lookupBST k' r
 \end{code}
 
 \noindent \highlighttt{memberBST}~$k~t$ returns

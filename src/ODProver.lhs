@@ -36,7 +36,7 @@ main = do
 \begin{code}
 run :: String -> IO ()
 run args = do
-   let (options,others) = trace ("Hello World")
+   let (options,others) =
           findOpts [ParamS "e", FlagS "t", FlagS "td",
              FlagS "tp"] (words args)
    case others of

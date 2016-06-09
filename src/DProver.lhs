@@ -22,6 +22,7 @@ import ABR.Data.BSTree; import ABR.Parser.Checks
 import DefeasibleLexer; import Literal; import DTheory
 import History; import DInference; import DProve
 import DRunFile
+import Debug.Trace
 \end{code}
 
 \begin{code}
@@ -102,6 +103,9 @@ interactive t options = do
    where
    proofLoop :: Options -> Hist -> WFHist -> IO ()
    proofLoop options h wh = do
+      -- traceIO ("Options " ++ show options)
+      -- traceIO ("h " ++ show h)
+      -- traceIO ("wh " ++ show wh)
       putStr "|- "
       hFlush stdout
       input <- getLine
@@ -187,7 +191,9 @@ proveOne t options input h wh
 	   return (h,wh)
         CheckPass tl -> do
 	   (h',wh',_) <- prove t options "nhlt" tl h wh
+
 	   return (h', wh')
+
 \end{code}
 
 \begin{code}
@@ -213,6 +219,7 @@ doRunFile t@(Theory fs rs ps) options rFile = do
                    (_,_,r) <- prove (Theory (fs' ++ fs)
                       rs ps) options "nhlt" tl
                       emptyHistory emptyHistory
+
                    case r of
                       "Proved"     -> return "P"
                       "Not proved" -> return "N"

@@ -28,7 +28,7 @@ type ThreadedTest m r s = s -> m (r, s)
 
 {\tt mkTest b} promotes some simple Boolean result {\tt b}
 to a {\tt ThreadedTest}.
-\verb"&&&" and \verb"|||" conjoin and disjoin two threaded
+\verb"&&&" and \verb"||| conjoin and disjoin two threaded
 tests. {\tt fA} and {\tt tE} are $\forall$ and $\exists$
 respectively.
 
@@ -46,9 +46,7 @@ class ThreadedResult r where
 \end{code}
 
 \begin{code}
-   (&&&), (|||) :: Monad m => ThreadedTest m r s
-                              -> ThreadedTest m r s
-			      -> ThreadedTest m r s
+   (&&&), (|||) :: Monad m => ThreadedTest m r s -> ThreadedTest m r s -> ThreadedTest m r s
 \end{code}
 
 \begin{code}

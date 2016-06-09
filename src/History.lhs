@@ -12,6 +12,7 @@ module History(
 
 \begin{code}
 import ABR.Data.BSTree
+import Debug.Trace
 \end{code}
 
 \submodule{Data types} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,7 +49,8 @@ This retrieves a {\tt ProofResult}.
 \begin{code}
 getResult :: Ord proof => History proof result -> proof
              -> Maybe result
-getResult h p = lookupBST p h
+getResult h p = trace ("In History.lhs getResult line 52 ")
+  lookupBST p h
 \end{code}
 
 
