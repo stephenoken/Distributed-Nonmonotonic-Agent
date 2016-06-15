@@ -135,7 +135,7 @@ interactive t options = do
 	    let cs = unwords css
 	    in if cs `elem` ["-","n","nt","nh","nht",
 	          "nhl","nhlt","nhlw","nhlwt"] then
-	          proofLoop (updateBST (\x _ -> x)
+	          proofLoop (updateBST (\x _ -> trace ("In DProver line 138 in interactive param x= " ++ show x) x)
 	          "e" (ParamValue cs) options) h wh
 	       else if cs == "" then do
 	          putStr "Current prover: "

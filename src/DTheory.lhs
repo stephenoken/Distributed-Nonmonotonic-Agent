@@ -189,11 +189,11 @@ theoryP
 	        \theory."
      findRule r' ((Rule label r):rs) n
         | r' /= r
-           = case findRule r' rs n of
+           = case trace ("In DTheory.lhs Line: 185 in findRule r' " ++ show r') findRule r' rs n of
                 (l, rs', n') ->
                    (l, (Rule label r) : rs', n')
         | otherwise
-           = case label of
+           = case trace ("In DTheory.lhs Line: 185 in findRule label= " ++ show label) label of
                 Label "" ->
                    let l = Label $ "R__" ++ show n
                    in (l, (Rule l r) : rs, n + 1)
@@ -213,8 +213,8 @@ involved in cycles is returned.
 cyclesCheck :: Check Theory Theory String
 cyclesCheck t@(Theory _ _ ps)
    = case  trace ("In DTheory.lhs Line: 213 in cyclesCheck Params ps =  " ++ show ps) cycles ps of
-        []  -> CheckPass t
-	ps' -> CheckFail $ show ps'
+        []  -> trace ("In DTheory.lhs Line: 213 in cyclesCheck Params t =  " ++ show t) CheckPass t
+	ps' -> trace ("In DTheory.lhs Line: 213 in cyclesCheck Params ps' =  " ++ show ps') CheckFail $ show ps'
 \end{code}
 
 
@@ -256,7 +256,7 @@ groundCheck t@(Theory fs rs ps)
 	           l' = Label ("R" ++ show n)
 		   sl' = insertSS l' emptySS
 	       in (Rule l' r : rs',
-	           updateBST unionSS l sl' t)
+	           trace ("In DTheory.lhs Line: 240 in groundCheck Params l =  " ++ show l ++ " sl'= " ++ show sl' ++ " t= " ++ show t) updateBST unionSS l sl' t)
 	 (rs'', lmap) = renumber 0 rs'
 	 dupPri :: Priority -> [Priority]
 	 dupPri (l :> l')
@@ -324,8 +324,7 @@ instance Show PrologTheory where
                  \:- multifile (neg)/1, (:=)/2, (:^)/2.\n\
                  \:- dynamic (neg)/1, (:=)/2, (:^)/2.\n\n"
         tree :: BSTree Label Rule
-        tree = foldr (\(Rule l r) ->
-	       updateBST (\x _ -> x) l r) emptyBST rs
+        tree = foldr (\(Rule l r) -> trace("In DTheory.lhs line 326 in tree Params l= " ++  show l ++ " r= " ++ show r) updateBST (\x _ -> x) l r) emptyBST rs
 	pr :: LRule -> PrologRule
 	pr = PrologRule . dropLabel
 	pp :: Priority -> PrologPriority

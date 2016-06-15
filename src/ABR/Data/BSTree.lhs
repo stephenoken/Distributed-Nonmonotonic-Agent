@@ -110,11 +110,11 @@ invariant.
 balance :: Ord k => (BSTree k v, Int) -> (BSTree k v, Int)
 balance (Node k v l r s, c)
    | 1 < s
-      = (shiftRight (Node k v l r s), c - 1)
+      = trace "In BSTree.lhs line 110 in balance S greater than 1" (shiftRight (Node k v l r s), c - 1)
    | s < -1
-      = (shiftLeft (Node k v l r s), c - 1)
+      = trace "In BSTree.lhs line 110 in balance S less than -1" (shiftLeft (Node k v l r s), c - 1)
    | otherwise
-      = (Node k v l r s, c)
+      = trace "In BSTree.lhs line 110 in balance S" (Node k v l r s, c)
         where
         shiftRight (Node k v l r s)
            | slope l == -1
@@ -154,10 +154,10 @@ If the $\mathit{key}$ already exists, $f$ is used to combine the two
 values. Use \verb"(\x _ -> x)" to merely replace.
 
 \begin{code}
-updateBST :: Ord k => (v -> v -> v) -> k -> v
+updateBST :: Ord k=> (v -> v -> v) -> k -> v
              -> BSTree k v -> BSTree k v
 updateBST f k' v'
-   = fst . update
+   = trace "In BSTree.lhs line 157 in updateBST" fst . update
      where
      update Empty
         = (Node k' v' Empty Empty 0, 1)
@@ -181,7 +181,7 @@ value from $t$.
 \begin{code}
 deleteBST :: Ord k => k -> BSTree k v -> BSTree k v
 deleteBST k'
-   = fst . delete
+   = trace "In BSTree.lhs line 182 in deleteBST" fst . delete
      where
      delete Empty
         = (Empty, 0)
@@ -219,11 +219,11 @@ with $k$ in $t$, or {\tt Nothing}.
 lookupBST :: Ord k => k -> BSTree k v -> Maybe v
 lookupBST k Empty
    = Nothing
-  --  ``Searches through a binary tree 
+  --  ``Searches through a binary tree
 lookupBST k' (Node k v l r _)
-   | k' < k    = trace("In BSTree.lhs lookupBST line 217 --> k' < k ")lookupBST k' l
-   | k' == k   = trace("In BSTree.lhs lookupBST line 217 --> k' == k ") Just v
-   | otherwise = trace("In BSTree.lhs lookupBST line 217 --> otherwise") lookupBST k' r
+   | k' < k    = trace"In BSTree.lhs lookupBST line 217 --> k' < k " lookupBST k' l
+   | k' == k   = trace"In BSTree.lhs lookupBST line 217 --> k' == k " Just v
+   | otherwise = trace"In BSTree.lhs lookupBST line 217 --> otherwise" lookupBST k' r
 \end{code}
 
 \noindent \highlighttt{memberBST}~$k~t$ returns
@@ -232,7 +232,7 @@ lookupBST k' (Node k v l r _)
 \begin{code}
 memberBST :: Ord k => k -> BSTree k v -> Bool
 memberBST k t
-   = case lookupBST k t of
+   = case trace "In BSTree.lhs line 157 in memberBST" lookupBST k t of
         Nothing -> False
         Just _  -> True
 \end{code}
@@ -252,10 +252,8 @@ lookupGuard bst keys handler process
         = process vals
      lookupGuard' (k:ks) vals
         = case lookupBST k bst of
-             Nothing    ->
-	        handler k
-             Just stuff ->
-	        lookupGuard' ks (vals ++ [stuff])
+             Nothing    -> handler k
+             Just stuff -> lookupGuard' ks (vals ++ [stuff])
 \end{code}
 
 \noindent \highlighttt{flattenBST}~$t$ returns the list of tuples $(k,v)$

@@ -11,6 +11,7 @@ module ThreadedTest(
       ThreadedResult(mkTest, (&&&), (|||),
                      fA', tE', fA, tE)
    ) where
+import Debug.Trace
 \end{code}
 
 \submodule{Data types} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,6 +58,6 @@ class ThreadedResult r where
 \begin{code}
    fA, tE :: Monad m => [b] -> (b -> ThreadedTest m r s)
                         -> ThreadedTest m r s
-   fA xs p = fA' (map p xs)
+   fA xs p = trace("In ThreadedTest.lhs on line 59") fA' (map p xs)
    tE xs p = tE' (map p xs)
 \end{code}

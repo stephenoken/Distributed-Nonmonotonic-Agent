@@ -321,7 +321,7 @@ proof result as a string are returned.
 prove :: Theory -> Options -> String -> Tagged Literal
          -> Hist -> WFHist -> IO (Hist, WFHist, String)
 prove t options def tl h wh = case lookupBST "e" options of
-      Nothing -> prove t (updateBST (\x _ -> x) "e"
+      Nothing -> trace "In DProve.lhs line 321 in prove" prove t (updateBST (\x _ -> x) "e"
                     (ParamValue def) options) def tl h wh
       Just (ParamValue cs) -> case cs of
          "-"     -> use_prove_ tl
