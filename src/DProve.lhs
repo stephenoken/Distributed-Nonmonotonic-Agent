@@ -232,9 +232,9 @@ prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nh
                 ++ show tl)
       return (r, (ng, h, indent))
    Nothing -> do
-      -- putStrLn ("In  Prove NHLT")
       putStrLn (indent ++ "To Prove: " ++ show tl)
-      -- putStrLn ("History " ++ show h)
+      putStrLn ("NG " ++ show ng)
+      putStrLn ("History " ++ show h)
       (r, (ng',h',_)) <- (t |-- tl)  prove_nhlt (ng, addProof h tl Pending, ".  " ++ indent)
       putStrLn (indent ++ show r ++ ": " ++ show tl)
       let h'' = case r of

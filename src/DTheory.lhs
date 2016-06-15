@@ -18,6 +18,7 @@ module DTheory(
 
 \begin{code}
 import Data.List
+import Debug.Trace
 \end{code}
 
 \begin{code}
@@ -63,7 +64,7 @@ structure used while parsing.
 data Statement =   Fact        !Literal
                  | LabeledRule !LRule
                  | Priority    !Priority
-                 | Superiority !Rule !Rule
+                 | Superiority !Rule !Rule deriving (Show)
 \end{code}
 
 The wrapper types {\tt PrologTheory} and
@@ -146,19 +147,19 @@ statementP =     prologSuperiorityP
 \begin{code}
 theoryP :: Parser Theory
 theoryP
-   = total (many (statementP ABR.Parser.<* nofail (
+   = trace ("In DTheory.lhs Line: 150 in theoryP ") total (many (statementP ABR.Parser.<* nofail (
                                   literalP "symbol" ".")))
      @> makeTheory
      where
      makeTheory :: [Statement] -> Theory
-     makeTheory = (\(fs,rs,ps) -> Theory fs rs ps)
+     makeTheory = trace ("In DTheory.lhs Line: 155 in makeTheory ") (\(fs,rs,ps) -> Theory fs rs ps)
                   . pass2 0 . pass1
      pass1 :: [Statement]
         -> ([Literal], [LRule], [Priority], [(Rule,Rule)])
      pass1 []
         = ([],[],[],[])
      pass1 (s:ss)
-        = case pass1 ss of
+        = case trace ("In DTheory.lhs Line: 155 in pass1 s: " ++ show s ++ " ss: " ++ show ss) pass1 ss of
              (fs,rs,ps,sups) ->
                 case s of
                    Fact f ->
@@ -173,11 +174,11 @@ theoryP
         -> ([Literal], [LRule], [Priority], [(Rule,Rule)])
         -> ([Literal], [LRule], [Priority])
      pass2 _ (fs, rs, ps, [])
-        = (fs, rs, ps)
+        = trace ("In DTheory.lhs Line: 176 in pass2  " ++ show (fs, rs, ps)) (fs, rs, ps)
      pass2 n (fs, rs, ps, ((r1,r2):sups))
-        = case findRule r1 rs n of
+        = case trace ("In DTheory.lhs Line: 178 in pass2  " ++ show (fs, rs, ps, ((r1,r2):sups))) findRule r1 rs n of
              (l1, rs', n') ->
-                case findRule r2 rs' n' of
+                case trace ("In DTheory.lhs Line: 181 in findRule  r2 = " ++ show r2 ++ " rs'= " ++ show rs') findRule r2 rs' n' of
                    (l2, rs'', n'') ->
                       pass2 n'' (fs, rs'', (l1 :> l2) : ps,
 		                 sups)
@@ -211,7 +212,7 @@ involved in cycles is returned.
 \begin{code}
 cyclesCheck :: Check Theory Theory String
 cyclesCheck t@(Theory _ _ ps)
-   = case cycles ps of
+   = case  trace ("In DTheory.lhs Line: 213 in cyclesCheck Params ps =  " ++ show ps) cycles ps of
         []  -> CheckPass t
 	ps' -> CheckFail $ show ps'
 \end{code}
@@ -238,7 +239,7 @@ If there are variables, but no constants the check fails.
 \begin{code}
 groundCheck :: Check Theory Theory String
 groundCheck t@(Theory fs rs ps)
-   = let cs = flattenSS $ getConstNames t emptySS
+   = let cs = trace ("In DTheory.lhs Line 240  in groundCheck " ++ show t) flattenSS $ getConstNames t emptySS
          vs = getVarNames t emptySS
          fs' = concat $ map (groundAll cs) fs
 	 rs' = concat $ map (groundAll cs) rs

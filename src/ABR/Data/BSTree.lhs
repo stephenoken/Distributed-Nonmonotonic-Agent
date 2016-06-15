@@ -219,6 +219,7 @@ with $k$ in $t$, or {\tt Nothing}.
 lookupBST :: Ord k => k -> BSTree k v -> Maybe v
 lookupBST k Empty
    = Nothing
+  --  ``Searches through a binary tree 
 lookupBST k' (Node k v l r _)
    | k' < k    = trace("In BSTree.lhs lookupBST line 217 --> k' < k ")lookupBST k' l
    | k' == k   = trace("In BSTree.lhs lookupBST line 217 --> k' == k ") Just v
