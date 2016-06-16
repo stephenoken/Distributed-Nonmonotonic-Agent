@@ -16,3 +16,6 @@ cabal.sandbox.config
 .stack-work/
 bin
 src/objects/
+
+theories/*
+!theories/**.t
