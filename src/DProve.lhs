@@ -24,8 +24,7 @@ import ABR.Args; import ABR.Data.BSTree
 import Literal; import DRule; import Priority
 import ThreadedTest; import ProofResult
 import History; import DTheory; import DInference
-import Debug.Trace
-import Control.Concurrent (forkIO)
+import DebugUtils.Trace
 \end{code}
 
 \submodule{Defeasible logic instance} %%%%%%%%%%%%%%%%%%%
@@ -321,7 +320,7 @@ proof result as a string are returned.
 prove :: Theory -> Options -> String -> Tagged Literal
          -> Hist -> WFHist -> IO (Hist, WFHist, String)
 prove t options def tl h wh = case lookupBST "e" options of
-      Nothing -> trace "In DProve.lhs line 321 in prove" prove t (updateBST (\x _ -> x) "e"
+      Nothing -> trace ("In DProve.lhs line 321 in prove params theory =  " ++ show t) prove t (updateBST (\x _ -> x) "e"
                     (ParamValue def) options) def tl h wh
       Just (ParamValue cs) -> case cs of
          "-"     -> use_prove_ tl

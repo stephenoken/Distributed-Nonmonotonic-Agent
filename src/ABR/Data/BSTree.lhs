@@ -154,22 +154,22 @@ If the $\mathit{key}$ already exists, $f$ is used to combine the two
 values. Use \verb"(\x _ -> x)" to merely replace.
 
 \begin{code}
-updateBST :: Ord k=> (v -> v -> v) -> k -> v
+updateBST :: (Ord k) => (v -> v -> v) -> k -> v
              -> BSTree k v -> BSTree k v
 updateBST f k' v'
    = trace "In BSTree.lhs line 157 in updateBST" fst . update
      where
      update Empty
-        = (Node k' v' Empty Empty 0, 1)
+        =  trace "Updating empty tree" (Node k' v' Empty Empty 0, 1)
      update (Node k v l r s)
         | k' < k
-           = let (l', c') = update l
+           = let (l', c') = trace "Updating tree key' < key" update l
                  c = if s >= 0 && c' == 1 then 1 else 0
              in balance (Node k v l' r (s + c'), c)
         | k' == k
-           = (Node k (f v' v) l r s, 0)
+           = trace "Updating tree key' == key" (Node k (f v' v) l r s, 0)
         | otherwise
-           = let (r', c') =  update r
+           = let (r', c') =  trace "Updating tree otherwise" update r
                  c = if s <= 0 && c' == 1 then 1 else 0
              in balance (Node k v l r' (s - c'), c)
 \end{code}

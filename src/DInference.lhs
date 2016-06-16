@@ -266,6 +266,7 @@ are shown in figure~\ref{infConditsFig2}.
 \raisebox{-1.25em}{$+\delta$:} &
 
 \begin{code}
+-- Todo Trace here 
    (|--) t (Plus PS_da q)  (|-)
       = t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_da a)) &&&
