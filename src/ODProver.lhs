@@ -23,7 +23,7 @@ import ABR.Parser.Checks
 import Literal; import DTheory; import Priority
 import DefeasibleLexer; import ODTheory; import History
 import DInference
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \begin{code}

@@ -11,7 +11,7 @@ module ThreadedTest(
       ThreadedResult(mkTest, (&&&), (|||),
                      fA', tE', fA, tE)
    ) where
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \submodule{Data types} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

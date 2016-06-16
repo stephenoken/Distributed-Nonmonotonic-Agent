@@ -22,7 +22,7 @@ import ABR.Data.BSTree; import ABR.Parser.Checks
 import DefeasibleLexer; import Literal; import DTheory
 import History; import DInference; import DProve
 import DRunFile
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \begin{code}

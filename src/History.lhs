@@ -12,7 +12,7 @@ module History(
 
 \begin{code}
 import ABR.Data.BSTree
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \submodule{Data types} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

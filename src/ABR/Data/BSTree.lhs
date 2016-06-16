@@ -30,7 +30,7 @@ module ABR.Data.BSTree (
       flattenBST, domBST, ranBST, countBST, leftBST,
       rightBST, mapBST, pairs2BST, list2BST
    ) where
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \submodule{Maintenance notes} %%%%%%%%%%%%%%%%%%%%%%

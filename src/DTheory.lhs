@@ -18,7 +18,7 @@ module DTheory(
 
 \begin{code}
 import Data.List
-import Debug.Trace
+import DebugUtils.Trace
 \end{code}
 
 \begin{code}
