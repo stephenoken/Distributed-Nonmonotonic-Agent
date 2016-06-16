@@ -16,4 +16,15 @@ ridiculously long problem.
 
 This will load the huskies problem from here you can query proofs such as `+d b`
 
+## Debugging Deimos
+The `run_deimos.py` script will help automating the debugging of Deimos
+
+### Current features
+- `python2 ./run_deimos.py -t ./theories/01huskies.t` will run DProver and output the contents in a `./theories/[theory name]/file_name.txt`
+
+### Planned features
+- Implement a watch feature to build deimos on the fly
+- Generate multiple files and compare the output
+
+Automate user input in Deimos
 Happy Hunting 😅
