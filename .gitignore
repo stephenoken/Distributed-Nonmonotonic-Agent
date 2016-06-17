@@ -19,3 +19,5 @@ src/objects/
 
 theories/*
 !theories/**.t
+
+*.swp
