@@ -180,7 +180,7 @@ prove_nht t tl (ng,h,indent) = case getResult h tl of
                 ++ show tl)
       return (r, (ng,h,indent))
    Nothing -> do
-      putStrLn ("In Prove NHT")
+      putStrLn ("++++ In Prove NHT")
       putStrLn (indent ++ "To Prove: " ++ show tl)
       (r, (ng',h',_)) <-
          (t |-- tl) prove_nht (ng, h, ".  " ++ indent)
@@ -222,7 +222,7 @@ performs loop checking. A trace is printed.
 
 \begin{code}
 prove_nhlt :: Theory -> Tagged Literal -> ThreadedTest IO ProofResult (Int, Hist, String)
-prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nhlt") getResult h tl of
+prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nhlt ") getResult h tl of
    Just Pending -> do
       putStrLn (indent ++ "Loop detected: " ++ show tl)
       return (Bottom, (ng, addProof h tl Bottom, indent))
@@ -232,8 +232,8 @@ prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nh
       return (r, (ng, h, indent))
    Nothing -> do
       putStrLn (indent ++ "To Prove: " ++ show tl)
-      putStrLn ("NG " ++ show ng)
-      putStrLn ("History " ++ show h)
+      putStrLn ("++++ NG " ++ show ng)
+      putStrLn ("++++ History " ++ show h)
       (r, (ng',h',_)) <- (t |-- tl)  prove_nhlt (ng, addProof h tl Pending, ".  " ++ indent)
       putStrLn (indent ++ show r ++ ": " ++ show tl)
       let h'' = case r of

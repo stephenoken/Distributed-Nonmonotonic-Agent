@@ -24,6 +24,7 @@ import ABR.Parser
 
 \begin{code}
 import Literal; import ThreadedTest
+import DebugUtils.Trace
 \end{code}
 
 \submodule{Data type definitions} %%%%%%%%%%%%%%%%%%%%%%%%
@@ -198,7 +199,7 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Plus PS_D q) (|-)
-      = q `isFactIn` t |||
+      = trace ("Hello")q `isFactIn` t |||
         tE (rsq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_D a))
 \end{code}
 
@@ -266,7 +267,7 @@ are shown in figure~\ref{infConditsFig2}.
 \raisebox{-1.25em}{$+\delta$:} &
 
 \begin{code}
--- Todo Trace here 
+-- Todo Trace here
    (|--) t (Plus PS_da q)  (|-)
       = t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_da a)) &&&

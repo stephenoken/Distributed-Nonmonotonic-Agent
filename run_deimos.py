@@ -2,7 +2,7 @@
 import os
 
 import argparse
-import datetime as dt 
+import datetime as dt
 import shutil
 
 parser = argparse.ArgumentParser(description='Run Deimos Program and out contents to file in theories directory.')
@@ -16,8 +16,14 @@ if os.path.isdir(dest_dir_name):
     shutil.rmtree(dest_dir_name)
 
 target_dir_path = args.theory[:-2] + "/"
-target_file_dest  = target_dir_path +  str(dt.datetime.now()).replace(" ","") + ".txt"
-proof = args.proof if args.proof.endswith("q") else args.proof + "\nq"
-echoProof = "echo \"" + proof + "\"|"
 os.mkdir(target_dir_path)
-os.system(echoProof + "time ./bin/i386-Darwin/DProver " + args.theory + " > " + target_file_dest)
+
+def run_deimos():
+    target_file_dest  = target_dir_path +  str(dt.datetime.now()).replace(" ","") + ".txt"
+    proof = args.proof if args.proof.endswith("q") else args.proof + "\nq"
+    echoProof = "echo \"" + proof + "\"|"
+    os.system(echoProof + " ./bin/i386-Darwin/DProver " + args.theory + ">& " + target_file_dest)
+
+
+
+run_deimos()
