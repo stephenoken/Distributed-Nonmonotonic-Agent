@@ -164,18 +164,18 @@ updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST" ++ toStrBsTre
      toStrBsTree :: (Show k, Show v) => BSTree k v -> String
      toStrBsTree n@(Node k v l r s) = show n
      update Empty
-        =  trace "Updating empty tree" (Node k' v' Empty Empty 0, 1)
+        =  trace "+-+-+- Updating empty tree" (Node k' v' Empty Empty 0, 1)
      update (Node k v l r s)
         | k' < k
-           = let (l', c') = trace "Updating tree key' < key" update l
+           = let (l', c') = trace ("+-+-+- update: " ++ show l) update l
                  c = if s >= 0 && c' == 1 then 1 else 0
-             in balance (Node k v l' r (s + c'), c)
+             in trace ("+-+-+- calling balance with k' < k: " ++ "[ " ++ show k' ++ ", " ++ show k ++ "]") balance (Node k v l' r (s + c'), c)
         | k' == k
-           = trace "Updating tree key' == key" (Node k (f v' v) l r s, 0)
+           = trace "+-+-+- Updating tree key' == key" (Node k (f v' v) l r s, 0)
         | otherwise
            = let (r', c') =  trace "Updating tree otherwise" update r
                  c = if s <= 0 && c' == 1 then 1 else 0
-             in balance (Node k v l r' (s - c'), c)
+             in trace "+-+-+- calling balance 2" balance (Node k v l r' (s - c'), c)
 \end{code}
 
 \noindent \highlighttt{deleteBST}~$k~t$ returns the
