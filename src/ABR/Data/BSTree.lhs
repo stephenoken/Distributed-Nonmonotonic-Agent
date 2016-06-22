@@ -154,11 +154,15 @@ If the $\mathit{key}$ already exists, $f$ is used to combine the two
 values. Use \verb"(\x _ -> x)" to merely replace.
 
 \begin{code}
-updateBST :: (Ord k) => (v -> v -> v) -> k -> v
+updateBST :: (Show v, Show k,Ord k) => (v -> v -> v) -> k -> v
              -> BSTree k v -> BSTree k v
-updateBST f k' v'
-   = trace "In BSTree.lhs line 157 in updateBST" fst . update
-     where
+updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST" ++ toStrBsTree z ++ "]") $ z
+    where
+     z = fst $ update a
+
+    --where
+     toStrBsTree :: (Show k, Show v) => BSTree k v -> String
+     toStrBsTree n@(Node k v l r s) = show n
      update Empty
         =  trace "Updating empty tree" (Node k' v' Empty Empty 0, 1)
      update (Node k v l r s)
@@ -301,7 +305,7 @@ BSTree}. If there are duplicate $v$'s for a $k$,
 only the first is retained.
 
 \begin{code}
-pairs2BST :: Ord k => [(k,v)] -> BSTree k v
+pairs2BST :: (Show k, Show v, Ord k) => [(k,v)] -> BSTree k v
 pairs2BST []
    = Empty
 pairs2BST ((k,v):kvs)
@@ -313,7 +317,7 @@ list of keys $\mathit{ks}$ to a {\tt BSTree}. The values in
 the tree are all assigned $v$.
 
 \begin{code}
-list2BST :: Ord k => [k] -> v -> BSTree k v
+list2BST :: (Show k, Show v, Ord k) => [k] -> v -> BSTree k v
 list2BST [] _
    = Empty
 list2BST (k:ks) v

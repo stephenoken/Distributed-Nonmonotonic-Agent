@@ -39,7 +39,7 @@ INSTALLDIR = ~/bin
 # GHC compilation options
 GHC = ghc --make -i$(LIBDIR) -odir $(OBJDIR) -hidir $(OBJDIR)
 
-# File copying command 
+# File copying command
 COPY = cp
 
 # File deleting command
@@ -55,7 +55,7 @@ DOCS = ${DOCDIR}/Deimos-long.pdf ${DOCDIR}/Deimos-short.pdf
 BINS = ${BINDIR}/DefeasibleParser ${BINDIR}/DProver ${BINDIR}/ODProver \
        ${BINDIR}/DTScale ${BINDIR}/Defeasible.cgi
 PC_BINS = ${BINDIR}/DefeasibleParser.exe ${BINDIR}/DProver.exe \
-          ${BINDIR}/ODProver.exe ${BINDIR}/DTScale.exe 
+          ${BINDIR}/ODProver.exe ${BINDIR}/DTScale.exe
 
 # Junk files made for and by Latex
 TEX_CRUD = *.aux *.log *.out *.toc *.bbl \
@@ -110,7 +110,7 @@ LIBMODULES = $(LIBDIR)/ABR/DeepSeq.lhs \
              $(LIBDIR)/ABR/Graph.lhs \
              $(LIBDIR)/ABR/CGI.lhs
 
-# Files to include when typesetting          
+# Files to include when typesetting
 INCLUDES = tex-includes/DProver.tex \
            tex-includes/DSyntax.tex \
            tex-includes/DTScale.tex \
@@ -141,7 +141,7 @@ INCLUDES = tex-includes/DProver.tex \
            tex-includes/ruleSyntax.tex \
            tex-includes/theorySyntax.tex
 
-# Packages needed when typesetting          
+# Packages needed when typesetting
 TEXPACKAGES = $(TEXDIR)/CrampedCode.cls \
               $(TEXDIR)/Handbook.cls \
               $(TEXDIR)/HaskellVerb.sty
@@ -171,11 +171,11 @@ doc : $(DOCS)
 # Make the executable
 .PHONY : bin
 bin : $(BINS)
-        
+
 # Make the executable
 .PHONY : pc_bin
 pc_bin : $(PC_BINS)
-        
+
 # Clean up intermediate products -- leaves some for distribution
 .PHONY : clean
 clean :
@@ -294,42 +294,42 @@ ${BINDIR}/DefeasibleParser : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) DefeasibleParser.lhs -o ${BINDIR}/DefeasibleParser
-	
+
 ${BINDIR}/DProver : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) DProver.lhs -o ${BINDIR}/DProver
-	
+
 ${BINDIR}/ODProver : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) ODProver.lhs -o ${BINDIR}/ODProver
-	
+
 ${BINDIR}/DTScale : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) DTScale.lhs -o ${BINDIR}/DTScale
-	
+
 ${BINDIR}/Defeasible.cgi : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) Defeasible.cgi.lhs -o ${BINDIR}/Defeasible.cgi
-	
+
 ${BINDIR}/DefeasibleParser.exe : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) DefeasibleParser.lhs -o ${BINDIR}/DefeasibleParser.exe
-	
+
 ${BINDIR}/DProver.exe : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) DProver.lhs -o ${BINDIR}/DProver.exe
-	
+
 ${BINDIR}/ODProver.exe : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)
 	$(GHC) ODProver.lhs -o ${BINDIR}/ODProver.exe
-	
+
 ${BINDIR}/DTScale.exe : $(MODULES) $(LIBMODULES)
 	mkdir -p $(OBJDIR)
 	mkdir -p $(BINDIR)

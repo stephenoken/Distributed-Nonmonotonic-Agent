@@ -79,28 +79,28 @@ $(V, E)$. The set of vertices $V$ assumed to exist is the
 range $[v..v']$. $E$ is the relation defining the edges.
 
 \begin{code}
-   mkGraph :: Ix v => v -> v -> [Edge v] -> g v
+   mkGraph :: (Show v, Ix v) => v -> v -> [Edge v] -> g v
 \end{code}
 
 \noindent {\tt vertices}~$G$ returns the list of vertices
 $V$ in graph $G$.
 
 \begin{code}
-   vertices :: Ix v => g v -> [v]
+   vertices :: (Show v, Ix v) => g v -> [v]
 \end{code}
 
 \noindent {\tt boundsG}~$G$ returns the least and greatest
 of the vertices $V$ in graph $G$.
 
 \begin{code}
-   boundsG :: Ix v => g v -> (v,v)
+   boundsG :: (Show v, Ix v) => g v -> (v,v)
 \end{code}
 
 \noindent {\tt edges}~$G$ returns the list of edges $E$
 in graph $G$.
 
 \begin{code}
-   edges :: Ix v => g v -> [Edge v]
+   edges :: (Show v, Ix v) => g v -> [Edge v]
 \end{code}
 
 \noindent {\tt adjacent}~$G$~$v$ returns the list of
@@ -108,7 +108,7 @@ vertices in graph $G$ that can be reached from vertex $v$
 in one step.
 
 \begin{code}
-   adjacent :: Ix v => g v -> v -> [v]
+   adjacent :: (Show v, Ix v) => g v -> v -> [v]
 \end{code}
 
 \noindent {\tt isAdjacent}~$G$~$v$~$v'$ returns {\tt True}
@@ -116,7 +116,7 @@ iff vertex $v'$ in graph $G$ can be reached from vertex
 $v$ in one step.
 
 \begin{code}
-   isAdjacent :: Ix v => g v -> v -> v -> Bool
+   isAdjacent :: (Show v, Ix v) => g v -> v -> v -> Bool
 \end{code}
 
 %%%%%%%
@@ -216,7 +216,7 @@ formed by applying $f$ to every edge in $G$, such that:
 \end{enumerate}
 
 \begin{code}
-mapG :: (Ix v, Ix v', Graph g, Graph g') =>
+mapG :: (Show v, Show v', Ix v, Ix v', Graph g, Graph g') =>
    (Edge v -> Edge v') -> v' -> v' -> g v -> g' v'
 mapG f v v' = mkGraph v v' . map f . edges
 \end{code}
@@ -225,7 +225,7 @@ mapG f v v' = mkGraph v v' . map f . edges
 $G$.
 
 \begin{code}
-transposeG :: (Ix v, Graph g) => g v -> g v
+transposeG :: (Show v, Ix v, Graph g) => g v -> g v
 transposeG g =
    let (v,v') = boundsG g
    in mapG (\(v,v') -> (v',v)) v v' g

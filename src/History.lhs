@@ -38,7 +38,7 @@ emptyHistory = emptyBST
 This adds a proof and status to the History.
 
 \begin{code}
-addProof :: Ord proof => History proof result -> proof
+addProof :: (Show proof, Show result, Ord proof) => History proof result -> proof
             -> result -> History proof result
 addProof h p s = updateBST (\x _ -> x) p s h
 \end{code}

@@ -5,7 +5,7 @@ import argparse
 import datetime as dt
 import shutil
 
-parser = argparse.ArgumentParser(description='Run Deimos Program and out contents to file in theories directory.')
+parser = argparse.ArgumentParser(description='Run Deimos Program and output contents to file in theories directory.')
 parser.add_argument( '-t', '--theory', type=str, help="Theory file path", default="./theories/01huskies.t")
 parser.add_argument('-p', '--proof', type=str, help="Proof to run against theory", default="+d b\nq")
 parser.add_argument('-rg', '--regexp', type=str, help="Enter regular expression", default="\"In DInfernce\"")

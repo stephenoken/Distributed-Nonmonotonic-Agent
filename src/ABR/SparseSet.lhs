@@ -73,7 +73,7 @@ nullSS = nullBST
 $\{e\} \cup s$.
 
 \begin{code}
-insertSS :: Ord k => k -> SparseSet k -> SparseSet k
+insertSS :: (Show k, Ord k) => k -> SparseSet k -> SparseSet k
 insertSS k = updateBST (\x _ -> x) k ()
 \end{code}
 
@@ -81,7 +81,7 @@ insertSS k = updateBST (\x _ -> x) k ()
 $\{e\}$.
 
 \begin{code}
-mkSS :: Ord k => k -> SparseSet k
+mkSS :: (Show k,  Ord k) => k -> SparseSet k
 mkSS e = insertSS e emptySS
 \end{code}
 
@@ -129,7 +129,7 @@ flattenSS = domBST
 set of elements in $\mathit{xs}$.
 
 \begin{code}
-list2SS :: Ord k => [k] -> SparseSet k
+list2SS :: (Show k, Ord k) => [k] -> SparseSet k
 list2SS xs = list2BST xs ()
 \end{code}
 
@@ -144,7 +144,7 @@ countSS = countBST
 \cup b$. This is faster if $|a| < |b|$.
 
 \begin{code}
-unionSS :: Ord k => SparseSet k -> SparseSet k
+unionSS :: (Show k, Ord k) => SparseSet k -> SparseSet k
                     -> SparseSet k
 unionSS a b = foldr insertSS b $ flattenSS a
 \end{code}
@@ -153,7 +153,7 @@ unionSS a b = foldr insertSS b $ flattenSS a
 \cap b$. This is faster if $|a| < |b|$.
 
 \begin{code}
-sectSS :: Ord k => SparseSet k -> SparseSet k
+sectSS :: (Show k, Ord k) => SparseSet k -> SparseSet k
                    -> SparseSet k
 sectSS a b = list2SS $ filter (`elemSS` b) $ flattenSS a
 \end{code}

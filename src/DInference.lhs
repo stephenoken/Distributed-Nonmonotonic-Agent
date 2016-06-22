@@ -199,7 +199,7 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Plus PS_D q) (|-)
-      = trace("In DInfernce line q `isFactIn` t ||| -> q = " ++ show q )q `isFactIn` t |||
+      = trace("In DInfernce line: 202 q `isFactIn` t ||| -> q = " ++ show q ) q `isFactIn` t |||
         tE (rsq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_D a))
 \end{code}
 
@@ -209,7 +209,7 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Minus PS_D q) (|-)
-      = trace("In DInfernce line q `notFactIn` t &&& -> q = " ++ show q )q `notFactIn` t &&&
+      = trace("In DInfernce line: 212 q `notFactIn` t &&& -> q = " ++ show q )q `notFactIn` t &&&
         fA (rsq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_D a))
 \end{code}
 
@@ -219,7 +219,7 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Plus PS_d q) (|-)
-      = trace("In DInfernce line t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
+      = trace("In DInfernce line: 222 t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_d a)) &&&
            t |- Minus PS_D (neg q) &&&
            fA (rq t (neg q)) (\s ->
@@ -234,7 +234,7 @@ manipulations and/or I/O.
 
 \begin{code}
    (|--) t (Minus PS_d q) (|-)
-      = trace("In DInfernce line t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
+      = trace("In DInfernce line: 237 t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
            fA (rsdq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_d a)) |||
            t |- Plus PS_D (neg q) |||
            tE (rq t (neg q)) (\s ->
@@ -269,7 +269,7 @@ are shown in figure~\ref{infConditsFig2}.
 \begin{code}
 -- Todo Trace here
    (|--) t (Plus PS_da q)  (|-)
-      = trace("In DInfernce line t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
+      = trace("In DInfernce line: 272 t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_da a)) &&&
            t |- Minus PS_D (neg q) &&&
            fA (rq t (neg q)) (\s ->
@@ -284,7 +284,7 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Minus PS_da q)  (|-)
-      = trace("In DInfernce line t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
+      = trace("In DInfernce line: 287 t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
            fA (rsdq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_da a)) |||
            t |- Plus PS_D (neg q) |||
            tE (rq t (neg q)) (\s ->
@@ -299,7 +299,7 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Plus PS_S q)  (|-)
-      = trace("In DInfernce line t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
+      = trace("In DInfernce line: 302 t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
            tE (rsdq t q) (\r ->
 	      fA (ants t r) (\a -> t |- Plus PS_S a) &&&
 	      fA (rq t (neg q)) (\s ->
@@ -312,7 +312,7 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Minus PS_S q)  (|-)
-      = trace("In DInfernce line t |- Minus PS_D q &&& -> q = " ++ show q )t |- Minus PS_D q &&&
+      = trace("In DInfernce line: 315 t |- Minus PS_D q &&& -> q = " ++ show q )t |- Minus PS_D q &&&
            fA (rsdq t q) (\r ->
 	      tE (ants t r) (\a -> t |- Minus PS_S a) |||
 	      tE (rq t (neg q)) (\s ->
@@ -326,7 +326,7 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Plus PS_dt q) (|-)
-      = trace("In DInfernce line t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
+      = trace("In DInfernce line: 329 t |- Plus PS_D q ||| -> q = " ++ show q )t |- Plus PS_D q |||
            tE (rsdq t q) (\r -> fA (ants t r) (\a -> t |- Plus PS_dt a) &&&
 	   t |- Minus PS_D (neg q) &&&
 	   fA (rq t (neg q)) (\s ->
@@ -340,7 +340,7 @@ are shown in figure~\ref{infConditsFig2}.
 
 \begin{code}
    (|--) t (Minus PS_dt q) (|-)
-      = trace("In DInfernce line t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
+      = trace("In DInfernce line: 343 t |- Minus PS_D q &&& ( -> q = " ++ show q )t |- Minus PS_D q &&& (
            fA (rsdq t q) (\r -> tE (ants t r) (\a -> t |- Minus PS_dt a) |||
 	   t |- Plus PS_D (neg q) |||
 	   tE (rq t (neg q)) (\s ->

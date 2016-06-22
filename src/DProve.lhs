@@ -222,7 +222,7 @@ performs loop checking. A trace is printed.
 
 \begin{code}
 prove_nhlt :: Theory -> Tagged Literal -> ThreadedTest IO ProofResult (Int, Hist, String)
-prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nhlt ") getResult h tl of
+prove_nhlt t tl (ng,h,indent) = case trace ("In DProve.lhs Line: 226 in prove_nhlt. Tagged Literal: [" ++ show tl ++ "]") getResult h tl of
    Just Pending -> do
       putStrLn (indent ++ "Loop detected: " ++ show tl)
       return (Bottom, (ng, addProof h tl Bottom, indent))
