@@ -156,13 +156,16 @@ values. Use \verb"(\x _ -> x)" to merely replace.
 \begin{code}
 updateBST :: (Show v, Show k,Ord k) => (v -> v -> v) -> k -> v
              -> BSTree k v -> BSTree k v
-updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST" ++ toStrBsTree z ++ "]") $ z
+updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST [\n" ++ unlines(toStrBsTree z) ++ "]") z
     where
      z = fst $ update a
+     toStrBsTree :: (Show k, Show v) => BSTree k v -> [String]
+     toStrBsTree Empty = []
+     toStrBsTree (Node k v l r s) = indent(toStrBsTree r) ++ [show (k,v)] ++ indent (toStrBsTree l)
+      where
+       indent :: [String] -> [String]
+       indent = map ("  --  "++)
 
-    --where
-     toStrBsTree :: (Show k, Show v) => BSTree k v -> String
-     toStrBsTree n@(Node k v l r s) = show n
      update Empty
         =  trace "+-+-+- Updating empty tree" (Node k' v' Empty Empty 0, 1)
      update (Node k v l r s)
@@ -225,9 +228,9 @@ lookupBST k Empty
    = Nothing
   --  ``Searches through a binary tree
 lookupBST k' (Node k v l r _)
-   | k' < k    = trace"In BSTree.lhs lookupBST line 217 --> k' < k " lookupBST k' l
-   | k' == k   = trace"In BSTree.lhs lookupBST line 217 --> k' == k " Just v
-   | otherwise = trace"In BSTree.lhs lookupBST line 217 --> otherwise" lookupBST k' r
+   | k' < k    = trace "In BSTree.lhs lookupBST line 217 --> k' < k " lookupBST k' l
+   | k' == k   = trace "In BSTree.lhs lookupBST line 217 --> k' == k " Just v
+   | otherwise = trace "In BSTree.lhs lookupBST line 217 --> otherwise" lookupBST k' r
 \end{code}
 
 \noindent \highlighttt{memberBST}~$k~t$ returns
@@ -264,7 +267,7 @@ lookupGuard bst keys handler process
 in $t$ in ascending order of key.
 
 \begin{code}
-flattenBST :: Ord k => BSTree k v -> [(k,v)]
+flattenBST :: (Show k, Show v, Ord k) => BSTree k v -> [(k,v)]
 flattenBST Empty
    = []
 flattenBST (Node k v Empty r _)

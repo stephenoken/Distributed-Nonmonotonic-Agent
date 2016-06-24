@@ -20,6 +20,8 @@ if os.path.isdir(dest_dir_name):
 target_dir_path = args.theory[:-2] + "/"
 os.mkdir(target_dir_path)
 
+os.system("cd src && make bin && cd ..")
+
 def run_deimos():
     target_file_dest  = target_dir_path +  str(dt.datetime.now()).replace(" ","") + ".txt"
     proof = args.proof if args.proof.endswith("q") else args.proof + "\nq"
