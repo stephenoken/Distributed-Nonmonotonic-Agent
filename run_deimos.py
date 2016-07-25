@@ -27,7 +27,7 @@ def run_deimos():
     proof = args.proof if args.proof.endswith("q") else args.proof + "\nq"
     echoProof = "echo \"" + proof + "\"|"
     os.system(echoProof + " ./bin/i386-Darwin/DProver " + args.theory + ">& " + target_file_dest)
-    os.system("grep -n " + args.regexp + " " + target_file_dest)
+    os.system("grep -nwE \"" + args.regexp + "\" " + target_file_dest)
     print os.linesep
 
 

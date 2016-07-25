@@ -161,7 +161,7 @@ updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST [\n" ++ unline
      z = fst $ update a
      toStrBsTree :: (Show k, Show v) => BSTree k v -> [String]
      toStrBsTree Empty = []
-     toStrBsTree (Node k v l r s) = indent(toStrBsTree r) ++ [show (k,v)] ++ indent (toStrBsTree l)
+     toStrBsTree (Node k v l r s) = indent(toStrBsTree r) ++ ["~>" ++show (k,v)] ++ indent (toStrBsTree l)
       where
        indent :: [String] -> [String]
        indent = map ("  --  "++)

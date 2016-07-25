@@ -40,7 +40,7 @@ This adds a proof and status to the History.
 \begin{code}
 addProof :: (Show proof, Show result, Ord proof) => History proof result -> proof
             -> result -> History proof result
-addProof h p s = updateBST (\x _ -> x) p s h
+addProof h p s = updateBST (\x _ -> trace("In History.lhs line 41 AddProof result = [" ++ show x ++ "]") x) p s h
 \end{code}
 
 
