@@ -110,11 +110,11 @@ invariant.
 balance :: Ord k => (BSTree k v, Int) -> (BSTree k v, Int)
 balance (Node k v l r s, c)
    | 1 < s
-      = trace "In BSTree.lhs line 110 in balance S greater than 1" (shiftRight (Node k v l r s), c - 1)
+      = (shiftRight (Node k v l r s), c - 1)
    | s < -1
-      = trace "In BSTree.lhs line 110 in balance S less than -1" (shiftLeft (Node k v l r s), c - 1)
+      =  (shiftLeft (Node k v l r s), c - 1)
    | otherwise
-      = trace "In BSTree.lhs line 110 in balance S" (Node k v l r s, c)
+      = (Node k v l r s, c)
         where
         shiftRight (Node k v l r s)
            | slope l == -1
@@ -156,7 +156,7 @@ values. Use \verb"(\x _ -> x)" to merely replace.
 \begin{code}
 updateBST :: (Show v, Show k,Ord k) => (v -> v -> v) -> k -> v
              -> BSTree k v -> BSTree k v
-updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST [\n" ++ unlines(toStrBsTree z) ++ "]") z
+updateBST f k' v' a =  z
     where
      z = fst $ update a
      toStrBsTree :: (Show k, Show v) => BSTree k v -> [String]
@@ -167,18 +167,18 @@ updateBST f k' v' a = trace ("In BSTree.lhs line 157 in updateBST [\n" ++ unline
        indent = map ("  --  "++)
 
      update Empty
-        =  trace "+-+-+- Updating empty tree" (Node k' v' Empty Empty 0, 1)
+        =   (Node k' v' Empty Empty 0, 1)
      update (Node k v l r s)
         | k' < k
-           = let (l', c') = trace ("+-+-+- update: " ++ show l) update l
+           = let (l', c') =  update l
                  c = if s >= 0 && c' == 1 then 1 else 0
-             in trace ("+-+-+- calling balance with k' < k: " ++ "[ " ++ show k' ++ ", " ++ show k ++ "]") balance (Node k v l' r (s + c'), c)
+             in balance (Node k v l' r (s + c'), c)
         | k' == k
-           = trace "+-+-+- Updating tree key' == key" (Node k (f v' v) l r s, 0)
+           =  (Node k (f v' v) l r s, 0)
         | otherwise
-           = let (r', c') =  trace "Updating tree otherwise" update r
+           = let (r', c') =   update r
                  c = if s <= 0 && c' == 1 then 1 else 0
-             in trace "+-+-+- calling balance 2" balance (Node k v l r' (s - c'), c)
+             in  balance (Node k v l r' (s - c'), c)
 \end{code}
 
 \noindent \highlighttt{deleteBST}~$k~t$ returns the
@@ -188,7 +188,7 @@ value from $t$.
 \begin{code}
 deleteBST :: Ord k => k -> BSTree k v -> BSTree k v
 deleteBST k'
-   = trace "In BSTree.lhs line 182 in deleteBST" fst . delete
+   =  fst . delete
      where
      delete Empty
         = (Empty, 0)
@@ -228,9 +228,9 @@ lookupBST k Empty
    = Nothing
   --  ``Searches through a binary tree
 lookupBST k' (Node k v l r _)
-   | k' < k    = trace "In BSTree.lhs lookupBST line 217 --> k' < k " lookupBST k' l
-   | k' == k   = trace "In BSTree.lhs lookupBST line 217 --> k' == k " Just v
-   | otherwise = trace "In BSTree.lhs lookupBST line 217 --> otherwise" lookupBST k' r
+   | k' < k    = lookupBST k' l
+   | k' == k   =  Just v
+   | otherwise = lookupBST k' r
 \end{code}
 
 \noindent \highlighttt{memberBST}~$k~t$ returns
@@ -239,7 +239,7 @@ lookupBST k' (Node k v l r _)
 \begin{code}
 memberBST :: Ord k => k -> BSTree k v -> Bool
 memberBST k t
-   = case trace "In BSTree.lhs line 157 in memberBST" lookupBST k t of
+   = case  lookupBST k t of
         Nothing -> False
         Just _  -> True
 \end{code}
